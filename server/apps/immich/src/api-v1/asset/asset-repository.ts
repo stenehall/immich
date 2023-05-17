@@ -5,9 +5,6 @@ import { Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm/repository/Repository';
 import { CuratedObjectsResponseDto } from './response-dto/curated-objects-response.dto';
-import { AssetCountByTimeBucket } from './response-dto/asset-count-by-time-group-response.dto';
-import { TimeGroupEnum } from './dto/get-asset-count-by-time-bucket.dto';
-import { GetAssetByTimeBucketDto } from './dto/get-asset-by-time-bucket.dto';
 import { AssetCountByUserIdResponseDto } from './response-dto/asset-count-by-user-id-response.dto';
 import { CheckExistingAssetsDto } from './dto/check-existing-assets.dto';
 import { CheckExistingAssetsResponseDto } from './response-dto/check-existing-assets-response.dto';
@@ -34,10 +31,8 @@ export interface IAssetRepository {
   getLocationsByUserId(userId: string): Promise<CuratedLocationsResponseDto[]>;
   getDetectedObjectsByUserId(userId: string): Promise<CuratedObjectsResponseDto[]>;
   getSearchPropertiesByUserId(userId: string): Promise<SearchPropertiesDto[]>;
-  getAssetCountByTimeBucket(userId: string, timeBucket: TimeGroupEnum): Promise<AssetCountByTimeBucket[]>;
   getAssetCountByUserId(userId: string): Promise<AssetCountByUserIdResponseDto>;
   getArchivedAssetCountByUserId(userId: string): Promise<AssetCountByUserIdResponseDto>;
-  getAssetByTimeBucket(userId: string, getAssetByTimeBucketDto: GetAssetByTimeBucketDto): Promise<AssetEntity[]>;
   getAssetByChecksum(userId: string, checksum: Buffer): Promise<AssetEntity>;
   getExistingAssets(
     userId: string,
@@ -101,53 +96,6 @@ export class AssetRepository implements IAssetRepository {
       .getRawMany();
 
     return this.getAssetCount(items);
-  }
-
-  async getAssetByTimeBucket(userId: string, getAssetByTimeBucketDto: GetAssetByTimeBucketDto): Promise<AssetEntity[]> {
-    // Get asset entity from a list of time buckets
-    return await this.assetRepository
-      .createQueryBuilder('asset')
-      .where('asset.ownerId = :userId', { userId: userId })
-      .andWhere(`date_trunc('month', "fileCreatedAt") IN (:...buckets)`, {
-        buckets: [...getAssetByTimeBucketDto.timeBucket],
-      })
-      .andWhere('asset.resizePath is not NULL')
-      .andWhere('asset.isVisible = true')
-      .andWhere('asset.isArchived = false')
-      .orderBy('asset.fileCreatedAt', 'DESC')
-      .getMany();
-  }
-
-  async getAssetCountByTimeBucket(userId: string, timeBucket: TimeGroupEnum) {
-    let result: AssetCountByTimeBucket[] = [];
-
-    if (timeBucket === TimeGroupEnum.Month) {
-      result = await this.assetRepository
-        .createQueryBuilder('asset')
-        .select(`COUNT(asset.id)::int`, 'count')
-        .addSelect(`date_trunc('month', "fileCreatedAt")`, 'timeBucket')
-        .where('"ownerId" = :userId', { userId: userId })
-        .andWhere('asset.resizePath is not NULL')
-        .andWhere('asset.isVisible = true')
-        .andWhere('asset.isArchived = false')
-        .groupBy(`date_trunc('month', "fileCreatedAt")`)
-        .orderBy(`date_trunc('month', "fileCreatedAt")`, 'DESC')
-        .getRawMany();
-    } else if (timeBucket === TimeGroupEnum.Day) {
-      result = await this.assetRepository
-        .createQueryBuilder('asset')
-        .select(`COUNT(asset.id)::int`, 'count')
-        .addSelect(`date_trunc('day', "fileCreatedAt")`, 'timeBucket')
-        .where('"ownerId" = :userId', { userId: userId })
-        .andWhere('asset.resizePath is not NULL')
-        .andWhere('asset.isVisible = true')
-        .andWhere('asset.isArchived = false')
-        .groupBy(`date_trunc('day', "fileCreatedAt")`)
-        .orderBy(`date_trunc('day', "fileCreatedAt")`, 'DESC')
-        .getRawMany();
-    }
-
-    return result;
   }
 
   async getSearchPropertiesByUserId(userId: string): Promise<SearchPropertiesDto[]> {

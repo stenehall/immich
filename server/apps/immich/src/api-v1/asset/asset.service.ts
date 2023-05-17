@@ -40,12 +40,6 @@ import { GetAssetThumbnailDto, GetAssetThumbnailFormatEnum } from './dto/get-ass
 import { CheckDuplicateAssetResponseDto } from './response-dto/check-duplicate-asset-response.dto';
 import { IAssetRepository } from './asset-repository';
 import { SearchPropertiesDto } from './dto/search-properties.dto';
-import {
-  AssetCountByTimeBucketResponseDto,
-  mapAssetCountByTimeBucket,
-} from './response-dto/asset-count-by-time-group-response.dto';
-import { GetAssetCountByTimeBucketDto } from './dto/get-asset-count-by-time-bucket.dto';
-import { GetAssetByTimeBucketDto } from './dto/get-asset-by-time-bucket.dto';
 import { AssetCountByUserIdResponseDto } from './response-dto/asset-count-by-user-id-response.dto';
 import { AssetCore } from './asset.core';
 import { CheckExistingAssetsDto } from './dto/check-existing-assets.dto';
@@ -153,22 +147,6 @@ export class AssetService {
     const assets = await this._assetRepository.getAllByUserId(authUser.id, dto);
 
     return assets.map((asset) => mapAssetMapMarker(asset)).filter((marker) => marker != null) as MapMarkerResponseDto[];
-  }
-
-  public async getAssetByTimeBucket(
-    authUser: AuthUserDto,
-    getAssetByTimeBucketDto: GetAssetByTimeBucketDto,
-  ): Promise<AssetResponseDto[]> {
-    if (getAssetByTimeBucketDto.userId) {
-      await this.checkUserAccess(authUser, getAssetByTimeBucketDto.userId);
-    }
-
-    const assets = await this._assetRepository.getAssetByTimeBucket(
-      getAssetByTimeBucketDto.userId || authUser.id,
-      getAssetByTimeBucketDto,
-    );
-
-    return assets.map((asset) => mapAsset(asset));
   }
 
   public async getAssetById(authUser: AuthUserDto, assetId: string): Promise<AssetResponseDto> {
@@ -474,22 +452,6 @@ export class AssetService {
     return this._assetRepository.getExistingAssets(authUser.id, checkExistingAssetsDto);
   }
 
-  async getAssetCountByTimeBucket(
-    authUser: AuthUserDto,
-    getAssetCountByTimeBucketDto: GetAssetCountByTimeBucketDto,
-  ): Promise<AssetCountByTimeBucketResponseDto> {
-    if (getAssetCountByTimeBucketDto.userId !== undefined) {
-      await this.checkUserAccess(authUser, getAssetCountByTimeBucketDto.userId);
-    }
-
-    const result = await this._assetRepository.getAssetCountByTimeBucket(
-      getAssetCountByTimeBucketDto.userId || authUser.id,
-      getAssetCountByTimeBucketDto.timeGroup,
-    );
-
-    return mapAssetCountByTimeBucket(result);
-  }
-
   getAssetByChecksum(userId: string, checksum: Buffer) {
     return this._assetRepository.getAssetByChecksum(userId, checksum);
   }
@@ -531,13 +493,6 @@ export class AssetService {
         }
       }
 
-      throw new ForbiddenException();
-    }
-  }
-
-  private async checkUserAccess(authUser: AuthUserDto, userId: string) {
-    // Check if userId shares assets with authUser
-    if (!(await this.partnerCore.get({ sharedById: userId, sharedWithId: authUser.id }))) {
       throw new ForbiddenException();
     }
   }

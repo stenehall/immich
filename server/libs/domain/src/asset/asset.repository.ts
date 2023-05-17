@@ -5,6 +5,17 @@ export interface AssetSearchOptions {
   type?: AssetType;
 }
 
+export enum TimeBucketSize {
+  DAY = 'DAY',
+  MONTH = 'MONTH',
+}
+
+export interface TimeBucketOptions {
+  size: TimeBucketSize;
+  isArchived?: boolean;
+  isFavorite?: boolean;
+}
+
 export interface LivePhotoSearchOptions {
   ownerId: string;
   livePhotoCID: string;
@@ -23,6 +34,11 @@ export enum WithoutProperty {
 
 export const IAssetRepository = 'IAssetRepository';
 
+export interface TimeBucketItem {
+  timeBucket: string;
+  count: number;
+}
+
 export interface IAssetRepository {
   getByIds(ids: string[]): Promise<AssetEntity[]>;
   getWithout(property: WithoutProperty): Promise<AssetEntity[]>;
@@ -31,4 +47,6 @@ export interface IAssetRepository {
   getAll(options?: AssetSearchOptions): Promise<AssetEntity[]>;
   save(asset: Partial<AssetEntity>): Promise<AssetEntity>;
   findLivePhotoMatch(options: LivePhotoSearchOptions): Promise<AssetEntity | null>;
+  getTimeBuckets(userId: string, options: TimeBucketOptions): Promise<TimeBucketItem[]>;
+  getByTimeBucket(userId: string, timeBucket: string, options: TimeBucketOptions): Promise<AssetEntity[]>;
 }

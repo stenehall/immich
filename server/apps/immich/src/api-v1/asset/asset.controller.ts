@@ -37,9 +37,6 @@ import { CreateAssetDto, mapToUploadFile } from './dto/create-asset.dto';
 import { AssetFileUploadResponseDto } from './response-dto/asset-file-upload-response.dto';
 import { DeleteAssetResponseDto } from './response-dto/delete-asset-response.dto';
 import { GetAssetThumbnailDto } from './dto/get-asset-thumbnail.dto';
-import { AssetCountByTimeBucketResponseDto } from './response-dto/asset-count-by-time-group-response.dto';
-import { GetAssetCountByTimeBucketDto } from './dto/get-asset-count-by-time-bucket.dto';
-import { GetAssetByTimeBucketDto } from './dto/get-asset-by-time-bucket.dto';
 import { AssetCountByUserIdResponseDto } from './response-dto/asset-count-by-user-id-response.dto';
 import { CheckExistingAssetsDto } from './dto/check-existing-assets.dto';
 import { CheckExistingAssetsResponseDto } from './response-dto/check-existing-assets-response.dto';
@@ -214,15 +211,6 @@ export class AssetController {
   }
 
   @Authenticated()
-  @Post('/count-by-time-bucket')
-  async getAssetCountByTimeBucket(
-    @GetAuthUser() authUser: AuthUserDto,
-    @Body(ValidationPipe) getAssetCountByTimeGroupDto: GetAssetCountByTimeBucketDto,
-  ): Promise<AssetCountByTimeBucketResponseDto> {
-    return this.assetService.getAssetCountByTimeBucket(authUser, getAssetCountByTimeGroupDto);
-  }
-
-  @Authenticated()
   @Get('/count-by-user-id')
   async getAssetCountByUserId(@GetAuthUser() authUser: AuthUserDto): Promise<AssetCountByUserIdResponseDto> {
     return this.assetService.getAssetCountByUserId(authUser);
@@ -249,15 +237,6 @@ export class AssetController {
     @Query(new ValidationPipe({ transform: true })) dto: AssetSearchDto,
   ): Promise<AssetResponseDto[]> {
     return this.assetService.getAllAssets(authUser, dto);
-  }
-
-  @Authenticated()
-  @Post('/time-bucket')
-  async getAssetByTimeBucket(
-    @GetAuthUser() authUser: AuthUserDto,
-    @Body(ValidationPipe) getAssetByTimeBucketDto: GetAssetByTimeBucketDto,
-  ): Promise<AssetResponseDto[]> {
-    return await this.assetService.getAssetByTimeBucket(authUser, getAssetByTimeBucketDto);
   }
 
   /**

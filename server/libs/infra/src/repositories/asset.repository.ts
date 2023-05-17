@@ -1,8 +1,21 @@
-import { AssetSearchOptions, IAssetRepository, LivePhotoSearchOptions, WithoutProperty } from '@app/domain';
+import {
+  AssetSearchOptions,
+  IAssetRepository,
+  LivePhotoSearchOptions,
+  TimeBucketItem,
+  TimeBucketOptions,
+  TimeBucketSize,
+  WithoutProperty,
+} from '@app/domain';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { FindOptionsRelations, FindOptionsWhere, In, IsNull, Not, Repository } from 'typeorm';
 import { AssetEntity, AssetType } from '../entities';
+
+const truncateMap: Record<TimeBucketSize, string> = {
+  [TimeBucketSize.DAY]: 'day',
+  [TimeBucketSize.MONTH]: 'month',
+};
 
 @Injectable()
 export class AssetRepository implements IAssetRepository {
@@ -15,9 +28,6 @@ export class AssetRepository implements IAssetRepository {
         exifInfo: true,
         smartInfo: true,
         tags: true,
-        faces: {
-          person: true,
-        },
       },
     });
   }
@@ -38,9 +48,6 @@ export class AssetRepository implements IAssetRepository {
         exifInfo: true,
         smartInfo: true,
         tags: true,
-        faces: {
-          person: true,
-        },
       },
     });
   }
@@ -54,7 +61,6 @@ export class AssetRepository implements IAssetRepository {
         owner: true,
         smartInfo: true,
         tags: true,
-        faces: true,
       },
     });
   }
@@ -165,5 +171,45 @@ export class AssetRepository implements IAssetRepository {
       where: { albums: { id: albumId } },
       order: { fileCreatedAt: 'DESC' },
     });
+  }
+
+  getTimeBuckets(userId: string, options: TimeBucketOptions): Promise<TimeBucketItem[]> {
+    const truncateValue = truncateMap[options.size];
+
+    return this.getBuilder(userId, options)
+      .select(`COUNT(asset.id)::int`, 'count')
+      .addSelect(`date_trunc('${truncateValue}', "fileCreatedAt")`, 'timeBucket')
+      .where('"ownerId" = :userId', { userId })
+      .groupBy(`date_trunc('${truncateValue}', "fileCreatedAt")`)
+      .orderBy(`date_trunc('${truncateValue}', "fileCreatedAt")`, 'DESC')
+      .getRawMany();
+  }
+
+  getByTimeBucket(userId: string, timeBucket: string, options: TimeBucketOptions): Promise<AssetEntity[]> {
+    const truncateValue = truncateMap[options.size];
+    return this.getBuilder(userId, options)
+      .andWhere(`date_trunc('${truncateValue}', "fileCreatedAt") = :timeBucket`, { timeBucket })
+      .orderBy('asset.fileCreatedAt', 'DESC')
+      .getMany();
+  }
+
+  private getBuilder(userId: string, options: TimeBucketOptions) {
+    const { isArchived, isFavorite } = options;
+
+    let builder = this.repository
+      .createQueryBuilder('asset')
+      .where('"ownerId" = :userId', { userId })
+      .andWhere('asset.resizePath is not NULL')
+      .andWhere('asset.isVisible = true');
+
+    if (isArchived != undefined) {
+      builder = builder.andWhere('asset.isArchived = :isArchived', { isArchived });
+    }
+
+    if (isFavorite !== undefined) {
+      builder = builder.andWhere('asset.isFavorite = :isFavorite', { isFavorite });
+    }
+
+    return builder;
   }
 }

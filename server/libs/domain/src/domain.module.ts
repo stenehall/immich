@@ -16,6 +16,7 @@ import { SmartInfoService } from './smart-info';
 import { StorageService } from './storage';
 import { StorageTemplateService } from './storage-template';
 import { INITIAL_SYSTEM_CONFIG, SystemConfigService } from './system-config';
+import { TimeBucketService } from './time-bucket';
 import { UserService } from './user';
 
 const providers: Provider[] = [
@@ -36,6 +37,7 @@ const providers: Provider[] = [
   StorageService,
   StorageTemplateService,
   SystemConfigService,
+  TimeBucketService,
   UserService,
   {
     provide: INITIAL_SYSTEM_CONFIG,
