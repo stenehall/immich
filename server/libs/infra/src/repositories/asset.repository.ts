@@ -179,7 +179,6 @@ export class AssetRepository implements IAssetRepository {
     return this.getBuilder(userId, options)
       .select(`COUNT(asset.id)::int`, 'count')
       .addSelect(`date_trunc('${truncateValue}', "fileCreatedAt")`, 'timeBucket')
-      .where('"ownerId" = :userId', { userId })
       .groupBy(`date_trunc('${truncateValue}', "fileCreatedAt")`)
       .orderBy(`date_trunc('${truncateValue}', "fileCreatedAt")`, 'DESC')
       .getRawMany();
