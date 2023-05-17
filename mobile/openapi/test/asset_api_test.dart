@@ -82,16 +82,6 @@ void main() {
       // TODO
     });
 
-    //Future<List<AssetResponseDto>> getAssetByTimeBucket(GetAssetByTimeBucketDto getAssetByTimeBucketDto) async
-    test('test getAssetByTimeBucket', () async {
-      // TODO
-    });
-
-    //Future<AssetCountByTimeBucketResponseDto> getAssetCountByTimeBucket(GetAssetCountByTimeBucketDto getAssetCountByTimeBucketDto) async
-    test('test getAssetCountByTimeBucket', () async {
-      // TODO
-    });
-
     //Future<AssetCountByUserIdResponseDto> getAssetCountByUserId() async
     test('test getAssetCountByUserId', () async {
       // TODO

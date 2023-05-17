@@ -100,8 +100,6 @@ Class | Method | HTTP request | Description
 *AssetApi* | [**getAllAssets**](doc//AssetApi.md#getallassets) | **GET** /asset | 
 *AssetApi* | [**getArchivedAssetCountByUserId**](doc//AssetApi.md#getarchivedassetcountbyuserid) | **GET** /asset/stat/archive | 
 *AssetApi* | [**getAssetById**](doc//AssetApi.md#getassetbyid) | **GET** /asset/assetById/{assetId} | 
-*AssetApi* | [**getAssetByTimeBucket**](doc//AssetApi.md#getassetbytimebucket) | **POST** /asset/time-bucket | 
-*AssetApi* | [**getAssetCountByTimeBucket**](doc//AssetApi.md#getassetcountbytimebucket) | **POST** /asset/count-by-time-bucket | 
 *AssetApi* | [**getAssetCountByUserId**](doc//AssetApi.md#getassetcountbyuserid) | **GET** /asset/count-by-user-id | 
 *AssetApi* | [**getAssetSearchTerms**](doc//AssetApi.md#getassetsearchterms) | **GET** /asset/search-terms | 
 *AssetApi* | [**getAssetThumbnail**](doc//AssetApi.md#getassetthumbnail) | **GET** /asset/thumbnail/{assetId} | 
@@ -158,6 +156,8 @@ Class | Method | HTTP request | Description
 *TagApi* | [**findAll**](doc//TagApi.md#findall) | **GET** /tag | 
 *TagApi* | [**findOne**](doc//TagApi.md#findone) | **GET** /tag/{id} | 
 *TagApi* | [**update**](doc//TagApi.md#update) | **PATCH** /tag/{id} | 
+*TimeBucketApi* | [**getByTimeBucket**](doc//TimeBucketApi.md#getbytimebucket) | **GET** /time-bucket/assets | 
+*TimeBucketApi* | [**getTimeBuckets**](doc//TimeBucketApi.md#gettimebuckets) | **GET** /time-bucket | 
 *UserApi* | [**createProfileImage**](doc//UserApi.md#createprofileimage) | **POST** /user/profile-image | 
 *UserApi* | [**createUser**](doc//UserApi.md#createuser) | **POST** /user | 
 *UserApi* | [**deleteUser**](doc//UserApi.md#deleteuser) | **DELETE** /user/{userId} | 
@@ -183,8 +183,6 @@ Class | Method | HTTP request | Description
  - [AlbumCountResponseDto](doc//AlbumCountResponseDto.md)
  - [AlbumResponseDto](doc//AlbumResponseDto.md)
  - [AllJobStatusResponseDto](doc//AllJobStatusResponseDto.md)
- - [AssetCountByTimeBucket](doc//AssetCountByTimeBucket.md)
- - [AssetCountByTimeBucketResponseDto](doc//AssetCountByTimeBucketResponseDto.md)
  - [AssetCountByUserIdResponseDto](doc//AssetCountByUserIdResponseDto.md)
  - [AssetFileUploadResponseDto](doc//AssetFileUploadResponseDto.md)
  - [AssetResponseDto](doc//AssetResponseDto.md)
@@ -209,8 +207,6 @@ Class | Method | HTTP request | Description
  - [DownloadFilesDto](doc//DownloadFilesDto.md)
  - [EditSharedLinkDto](doc//EditSharedLinkDto.md)
  - [ExifResponseDto](doc//ExifResponseDto.md)
- - [GetAssetByTimeBucketDto](doc//GetAssetByTimeBucketDto.md)
- - [GetAssetCountByTimeBucketDto](doc//GetAssetCountByTimeBucketDto.md)
  - [JobCommand](doc//JobCommand.md)
  - [JobCommandDto](doc//JobCommandDto.md)
  - [JobCountsDto](doc//JobCountsDto.md)
@@ -253,7 +249,8 @@ Class | Method | HTTP request | Description
  - [TagResponseDto](doc//TagResponseDto.md)
  - [TagTypeEnum](doc//TagTypeEnum.md)
  - [ThumbnailFormat](doc//ThumbnailFormat.md)
- - [TimeGroupEnum](doc//TimeGroupEnum.md)
+ - [TimeBucketResponseDto](doc//TimeBucketResponseDto.md)
+ - [TimeBucketSize](doc//TimeBucketSize.md)
  - [UpdateAlbumDto](doc//UpdateAlbumDto.md)
  - [UpdateAssetDto](doc//UpdateAssetDto.md)
  - [UpdateTagDto](doc//UpdateTagDto.md)

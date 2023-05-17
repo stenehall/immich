@@ -203,10 +203,6 @@ class ApiClient {
           return AlbumResponseDto.fromJson(value);
         case 'AllJobStatusResponseDto':
           return AllJobStatusResponseDto.fromJson(value);
-        case 'AssetCountByTimeBucket':
-          return AssetCountByTimeBucket.fromJson(value);
-        case 'AssetCountByTimeBucketResponseDto':
-          return AssetCountByTimeBucketResponseDto.fromJson(value);
         case 'AssetCountByUserIdResponseDto':
           return AssetCountByUserIdResponseDto.fromJson(value);
         case 'AssetFileUploadResponseDto':
@@ -255,10 +251,6 @@ class ApiClient {
           return EditSharedLinkDto.fromJson(value);
         case 'ExifResponseDto':
           return ExifResponseDto.fromJson(value);
-        case 'GetAssetByTimeBucketDto':
-          return GetAssetByTimeBucketDto.fromJson(value);
-        case 'GetAssetCountByTimeBucketDto':
-          return GetAssetCountByTimeBucketDto.fromJson(value);
         case 'JobCommand':
           return JobCommandTypeTransformer().decode(value);
         case 'JobCommandDto':
@@ -343,8 +335,10 @@ class ApiClient {
           return TagTypeEnumTypeTransformer().decode(value);
         case 'ThumbnailFormat':
           return ThumbnailFormatTypeTransformer().decode(value);
-        case 'TimeGroupEnum':
-          return TimeGroupEnumTypeTransformer().decode(value);
+        case 'TimeBucketResponseDto':
+          return TimeBucketResponseDto.fromJson(value);
+        case 'TimeBucketSize':
+          return TimeBucketSizeTypeTransformer().decode(value);
         case 'UpdateAlbumDto':
           return UpdateAlbumDto.fromJson(value);
         case 'UpdateAssetDto':
