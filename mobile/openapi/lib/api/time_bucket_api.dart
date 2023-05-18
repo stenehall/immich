@@ -25,10 +25,12 @@ class TimeBucketApi {
   ///
   /// * [String] userId:
   ///
+  /// * [String] albumId:
+  ///
   /// * [bool] isArchived:
   ///
   /// * [bool] isFavorite:
-  Future<Response> getByTimeBucketWithHttpInfo(TimeBucketSize size, String timeBucket, { String? userId, bool? isArchived, bool? isFavorite, }) async {
+  Future<Response> getByTimeBucketWithHttpInfo(TimeBucketSize size, String timeBucket, { String? userId, String? albumId, bool? isArchived, bool? isFavorite, }) async {
     // ignore: prefer_const_declarations
     final path = r'/time-bucket/assets';
 
@@ -42,6 +44,9 @@ class TimeBucketApi {
       queryParams.addAll(_queryParams('', 'size', size));
     if (userId != null) {
       queryParams.addAll(_queryParams('', 'userId', userId));
+    }
+    if (albumId != null) {
+      queryParams.addAll(_queryParams('', 'albumId', albumId));
     }
     if (isArchived != null) {
       queryParams.addAll(_queryParams('', 'isArchived', isArchived));
@@ -73,11 +78,13 @@ class TimeBucketApi {
   ///
   /// * [String] userId:
   ///
+  /// * [String] albumId:
+  ///
   /// * [bool] isArchived:
   ///
   /// * [bool] isFavorite:
-  Future<List<AssetResponseDto>?> getByTimeBucket(TimeBucketSize size, String timeBucket, { String? userId, bool? isArchived, bool? isFavorite, }) async {
-    final response = await getByTimeBucketWithHttpInfo(size, timeBucket,  userId: userId, isArchived: isArchived, isFavorite: isFavorite, );
+  Future<List<AssetResponseDto>?> getByTimeBucket(TimeBucketSize size, String timeBucket, { String? userId, String? albumId, bool? isArchived, bool? isFavorite, }) async {
+    final response = await getByTimeBucketWithHttpInfo(size, timeBucket,  userId: userId, albumId: albumId, isArchived: isArchived, isFavorite: isFavorite, );
     if (response.statusCode >= HttpStatus.badRequest) {
       throw ApiException(response.statusCode, await _decodeBodyBytes(response));
     }
@@ -101,10 +108,12 @@ class TimeBucketApi {
   ///
   /// * [String] userId:
   ///
+  /// * [String] albumId:
+  ///
   /// * [bool] isArchived:
   ///
   /// * [bool] isFavorite:
-  Future<Response> getTimeBucketsWithHttpInfo(TimeBucketSize size, { String? userId, bool? isArchived, bool? isFavorite, }) async {
+  Future<Response> getTimeBucketsWithHttpInfo(TimeBucketSize size, { String? userId, String? albumId, bool? isArchived, bool? isFavorite, }) async {
     // ignore: prefer_const_declarations
     final path = r'/time-bucket';
 
@@ -118,6 +127,9 @@ class TimeBucketApi {
       queryParams.addAll(_queryParams('', 'size', size));
     if (userId != null) {
       queryParams.addAll(_queryParams('', 'userId', userId));
+    }
+    if (albumId != null) {
+      queryParams.addAll(_queryParams('', 'albumId', albumId));
     }
     if (isArchived != null) {
       queryParams.addAll(_queryParams('', 'isArchived', isArchived));
@@ -146,11 +158,13 @@ class TimeBucketApi {
   ///
   /// * [String] userId:
   ///
+  /// * [String] albumId:
+  ///
   /// * [bool] isArchived:
   ///
   /// * [bool] isFavorite:
-  Future<List<TimeBucketResponseDto>?> getTimeBuckets(TimeBucketSize size, { String? userId, bool? isArchived, bool? isFavorite, }) async {
-    final response = await getTimeBucketsWithHttpInfo(size,  userId: userId, isArchived: isArchived, isFavorite: isFavorite, );
+  Future<List<TimeBucketResponseDto>?> getTimeBuckets(TimeBucketSize size, { String? userId, String? albumId, bool? isArchived, bool? isFavorite, }) async {
+    final response = await getTimeBucketsWithHttpInfo(size,  userId: userId, albumId: albumId, isArchived: isArchived, isFavorite: isFavorite, );
     if (response.statusCode >= HttpStatus.badRequest) {
       throw ApiException(response.statusCode, await _decodeBodyBytes(response));
     }
