@@ -44,5 +44,11 @@
 			</svelte:fragment>
 		</ControlAppBar>
 	{/if}
-	<AssetGrid options={{ size: TimeBucketSize.Month, userId: data.partner.id }} />
+	<AssetGrid
+		options={{
+			size: TimeBucketSize.Month,
+			isArchived: false,
+			userId: data.partner.id
+		}}
+	/>
 </main>
