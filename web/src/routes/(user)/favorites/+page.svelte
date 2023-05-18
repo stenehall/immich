@@ -28,7 +28,12 @@
 	</AssetSelectControlBar>
 {/if}
 
-<UserPageLayout user={data.user} hideNavbar={$isMultiSelectStoreState} title={data.meta.title}>
+<UserPageLayout
+	user={data.user}
+	hideNavbar={$isMultiSelectStoreState}
+	title={data.meta.title}
+	scrollbar={false}
+>
 	{#if empty}
 		<EmptyPlaceholder
 			text="Add favorites to quickly find your best pictures and videos"
