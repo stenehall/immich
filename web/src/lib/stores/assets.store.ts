@@ -1,7 +1,7 @@
-import { AssetGridState } from '$lib/models/asset-grid-state';
+import { AssetGridOptions, AssetGridState } from '$lib/models/asset-grid-state';
 import { calculateViewportHeightByNumberOfAsset } from '$lib/utils/viewport-utils';
-import { api, AssetCountByTimeBucketResponseDto } from '@api';
-import { sumBy, flatMap } from 'lodash-es';
+import { api, TimeBucketResponseDto, TimeBucketSize } from '@api';
+import { flatMap, sumBy } from 'lodash-es';
 import { writable } from 'svelte/store';
 
 /**
@@ -12,14 +12,11 @@ export const loadingBucketState = writable<{ [key: string]: boolean }>({});
 
 function createAssetStore() {
 	let _assetGridState = new AssetGridState();
-	assetGridState.subscribe((state) => {
-		_assetGridState = state;
-	});
+	assetGridState.subscribe((state) => (_assetGridState = state));
 
 	let _loadingBucketState: { [key: string]: boolean } = {};
-	loadingBucketState.subscribe((state) => {
-		_loadingBucketState = state;
-	});
+	loadingBucketState.subscribe((state) => (_loadingBucketState = state));
+
 	/**
 	 * Set initial state
 	 * @param viewportHeight
@@ -29,21 +26,21 @@ function createAssetStore() {
 	const setInitialState = (
 		viewportHeight: number,
 		viewportWidth: number,
-		data: AssetCountByTimeBucketResponseDto,
-		userId: string | undefined
+		timeBuckets: TimeBucketResponseDto[],
+		options: AssetGridOptions
 	) => {
 		assetGridState.set({
 			viewportHeight,
 			viewportWidth,
 			timelineHeight: 0,
-			buckets: data.buckets.map((d) => ({
-				bucketDate: d.timeBucket,
-				bucketHeight: calculateViewportHeightByNumberOfAsset(d.count, viewportWidth),
+			buckets: timeBuckets.map(({ timeBucket, count }) => ({
+				bucketDate: timeBucket,
+				bucketHeight: calculateViewportHeightByNumberOfAsset(count, viewportWidth),
 				assets: [],
 				cancelToken: new AbortController()
 			})),
 			assets: [],
-			userId
+			options
 		});
 
 		// Update timeline height based on calculated bucket height
@@ -64,11 +61,12 @@ function createAssetStore() {
 				..._loadingBucketState,
 				[bucket]: true
 			});
-			const { data: assets } = await api.assetApi.getAssetByTimeBucket(
-				{
-					timeBucket: [bucket],
-					userId: _assetGridState.userId
-				},
+			const { data: assets } = await api.timeBucketApi.getByTimeBucket(
+				TimeBucketSize.Month,
+				bucket,
+				_assetGridState.options.userId,
+				_assetGridState.options.isArchived,
+				_assetGridState.options.isFavorite,
 				{ signal: currentBucketData?.cancelToken.signal }
 			);
 			loadingBucketState.set({

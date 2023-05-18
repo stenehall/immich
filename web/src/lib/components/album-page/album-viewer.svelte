@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { browser } from '$app/environment';
 	import { afterNavigate, goto } from '$app/navigation';
-	import { albumAssetSelectionStore } from '$lib/stores/album-asset-selection.store';
 	import { downloadAssets } from '$lib/stores/download';
 	import { locale } from '$lib/stores/preferences.store';
 	import { clickOutside } from '$lib/utils/click-outside';
@@ -47,13 +46,10 @@
 	export let album: AlbumResponseDto;
 	export let sharedLink: SharedLinkResponseDto | undefined = undefined;
 
-	const { isAlbumAssetSelectionOpen } = albumAssetSelectionStore;
-
 	let isShowAssetSelection = false;
 
 	let isShowShareLinkModal = false;
 
-	$: $isAlbumAssetSelectionOpen = isShowAssetSelection;
 	$: {
 		if (browser) {
 			if (isShowAssetSelection) {
@@ -494,12 +490,7 @@
 		{/if}
 
 		{#if album.assetCount > 0}
-			<GalleryViewer
-				assets={album.assets}
-				{sharedLink}
-				bind:selectedAssets={multiSelectAsset}
-				viewFrom="album-page"
-			/>
+			<GalleryViewer assets={album.assets} {sharedLink} bind:selectedAssets={multiSelectAsset} />
 		{:else}
 			<!-- Album is empty - Show asset selectection buttons -->
 			<section id="empty-album" class=" mt-[200px] flex place-content-center place-items-center">

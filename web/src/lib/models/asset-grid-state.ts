@@ -1,4 +1,4 @@
-import { AssetResponseDto } from '@api';
+import { AssetResponseDto, TimeBucketSize } from '@api';
 
 export class AssetBucket {
 	/**
@@ -9,6 +9,13 @@ export class AssetBucket {
 	bucketDate!: string;
 	assets!: AssetResponseDto[];
 	cancelToken!: AbortController;
+}
+
+export interface AssetGridOptions {
+	size: TimeBucketSize;
+	userId?: string;
+	isArchived?: boolean;
+	isFavorite?: boolean;
 }
 
 export class AssetGridState {
@@ -38,8 +45,5 @@ export class AssetGridState {
 	 */
 	assets: AssetResponseDto[] = [];
 
-	/**
-	 * User that owns assets
-	 */
-	userId: string | undefined;
+	options: AssetGridOptions = { size: TimeBucketSize.Month };
 }

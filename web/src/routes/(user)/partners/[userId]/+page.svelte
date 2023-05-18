@@ -10,6 +10,7 @@
 		isMultiSelectStoreState,
 		selectedAssets
 	} from '$lib/stores/asset-interaction.store';
+	import { TimeBucketSize } from '@api';
 	import { onDestroy } from 'svelte';
 	import ArrowLeft from 'svelte-material-icons/ArrowLeft.svelte';
 	import type { PageData } from './$types';
@@ -43,5 +44,5 @@
 			</svelte:fragment>
 		</ControlAppBar>
 	{/if}
-	<AssetGrid user={data.partner} />
+	<AssetGrid options={{ size: TimeBucketSize.Month, userId: data.partner.id }} />
 </main>

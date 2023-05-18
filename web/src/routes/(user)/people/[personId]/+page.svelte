@@ -104,7 +104,6 @@
 		<section id="search-content" class="relative bg-immich-bg dark:bg-immich-dark-bg">
 			<GalleryViewer
 				assets={data.assets}
-				viewFrom="search-page"
 				showArchiveIcon={true}
 				bind:selectedAssets={multiSelectAsset}
 			/>

@@ -2,7 +2,7 @@
 	import { createEventDispatcher, onMount } from 'svelte';
 	import { quintOut } from 'svelte/easing';
 	import { fly } from 'svelte/transition';
-	import { AssetResponseDto } from '@api';
+	import { AssetResponseDto, TimeBucketSize } from '@api';
 	import { openFileUploadDialog } from '$lib/utils/file-uploader';
 	import ControlAppBar from '../shared-components/control-app-bar.svelte';
 	import AssetGrid from '../photos-page/asset-grid.svelte';
@@ -75,6 +75,12 @@
 		</svelte:fragment>
 	</ControlAppBar>
 	<section class="pt-[100px] pl-[70px] grid h-screen bg-immich-bg dark:bg-immich-dark-bg">
-		<AssetGrid isAlbumSelectionMode={true} />
+		<AssetGrid
+			isAlbumSelectionMode={true}
+			options={{
+				isArchived: false,
+				size: TimeBucketSize.Month
+			}}
+		/>
 	</section>
 </section>
