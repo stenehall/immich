@@ -51,6 +51,8 @@
 
 	export let album: AlbumResponseDto;
 	export let sharedLink: SharedLinkResponseDto | undefined = undefined;
+	export let startDate: Date = new Date();
+	export let endDate: Date = new Date();
 
 	let isShowAssetSelection = false;
 	let isShowShareLinkModal = false;
@@ -81,8 +83,6 @@
 	$: isPublicShared = sharedLink;
 	$: isOwned = currentUser?.id == album.ownerId;
 
-	let multiSelectAsset: Set<AssetResponseDto> = new Set();
-
 	afterNavigate(({ from }) => {
 		backUrl = from?.url.pathname ?? '/albums';
 
@@ -98,9 +98,6 @@
 	};
 
 	const getDateRange = () => {
-		const startDate = new Date(album.assets[0].fileCreatedAt);
-		const endDate = new Date(album.assets[album.assetCount - 1].fileCreatedAt);
-
 		const startDateString = startDate.toLocaleDateString($locale, albumDateFormat);
 		const endDateString = endDate.toLocaleDateString($locale, albumDateFormat);
 
@@ -491,7 +488,14 @@
 		{/if}
 
 		{#if album.assetCount > 0}
-			<AssetGrid bind:empty options={{ albumId: album.id, size: TimeBucketSize.Month }} />
+			<AssetGrid
+				bind:empty
+				options={{
+					size: TimeBucketSize.Month,
+					albumId: album.id,
+					sharedKey: sharedLink?.key
+				}}
+			/>
 		{:else}
 			<!-- Album is empty - Show asset selectection buttons -->
 			<section id="empty-album" class=" mt-[200px] flex place-content-center place-items-center">

@@ -5,6 +5,4 @@
 	export let data: PageData;
 </script>
 
-<div class="immich-scrollbar">
-	<AlbumViewer album={data.album} />
-</div>
+<AlbumViewer album={data.album} startDate={data.startDate} endDate={data.endDate} />

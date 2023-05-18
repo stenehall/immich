@@ -17,6 +17,7 @@ export interface AssetGridOptions {
 	userId?: string;
 	isArchived?: boolean;
 	isFavorite?: boolean;
+	sharedKey?: string;
 }
 
 export class AssetGridState {

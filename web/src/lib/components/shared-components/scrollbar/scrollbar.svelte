@@ -134,7 +134,7 @@
 			class="relative"
 			style:height={segment.height + 'px'}
 			aria-label={segment.timeGroup + ' ' + segment.count}
-			on:mousemove={(e) => handleMouseMove(groupDate)}
+			on:mousemove={() => handleMouseMove(groupDate)}
 		>
 			{#if new Date(segmentScrollbarLayout[index - 1]?.timeGroup).getFullYear() !== groupDate.getFullYear()}
 				{#if segment.height > 8}

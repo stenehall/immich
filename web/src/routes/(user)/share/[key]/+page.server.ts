@@ -12,8 +12,13 @@ export const load = (async ({ params, locals: { api } }) => {
 		const assetCount = sharedLink.assets.length;
 		const assetId = sharedLink.album?.albumThumbnailAssetId || sharedLink.assets[0]?.id;
 
+		const startDate = new Date(sharedLink.assets[0].fileCreatedAt);
+		const endDate = new Date(sharedLink.assets[assetCount - 1].fileCreatedAt);
+
 		return {
 			sharedLink,
+			startDate,
+			endDate,
 			meta: {
 				title: sharedLink.album ? sharedLink.album.albumName : 'Public Share',
 				description: sharedLink.description || `${assetCount} shared photos & videos.`,

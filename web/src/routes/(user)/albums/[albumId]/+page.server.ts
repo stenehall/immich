@@ -11,8 +11,16 @@ export const load = (async ({ params, locals: { api, user } }) => {
 
 	try {
 		const { data: album } = await api.albumApi.getAlbumInfo(albumId);
+
+		const startDate = new Date(album.assets[0].fileCreatedAt);
+		const endDate = new Date(album.assets[album.assetCount - 1].fileCreatedAt);
+
+		album.assets = [];
+
 		return {
 			album,
+			startDate,
+			endDate,
 			meta: {
 				title: album.albumName
 			}

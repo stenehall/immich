@@ -30,7 +30,9 @@ class TimeBucketApi {
   /// * [bool] isArchived:
   ///
   /// * [bool] isFavorite:
-  Future<Response> getByTimeBucketWithHttpInfo(TimeBucketSize size, String timeBucket, { String? userId, String? albumId, bool? isArchived, bool? isFavorite, }) async {
+  ///
+  /// * [String] key:
+  Future<Response> getByTimeBucketWithHttpInfo(TimeBucketSize size, String timeBucket, { String? userId, String? albumId, bool? isArchived, bool? isFavorite, String? key, }) async {
     // ignore: prefer_const_declarations
     final path = r'/time-bucket/assets';
 
@@ -55,6 +57,9 @@ class TimeBucketApi {
       queryParams.addAll(_queryParams('', 'isFavorite', isFavorite));
     }
       queryParams.addAll(_queryParams('', 'timeBucket', timeBucket));
+    if (key != null) {
+      queryParams.addAll(_queryParams('', 'key', key));
+    }
 
     const contentTypes = <String>[];
 
@@ -83,8 +88,10 @@ class TimeBucketApi {
   /// * [bool] isArchived:
   ///
   /// * [bool] isFavorite:
-  Future<List<AssetResponseDto>?> getByTimeBucket(TimeBucketSize size, String timeBucket, { String? userId, String? albumId, bool? isArchived, bool? isFavorite, }) async {
-    final response = await getByTimeBucketWithHttpInfo(size, timeBucket,  userId: userId, albumId: albumId, isArchived: isArchived, isFavorite: isFavorite, );
+  ///
+  /// * [String] key:
+  Future<List<AssetResponseDto>?> getByTimeBucket(TimeBucketSize size, String timeBucket, { String? userId, String? albumId, bool? isArchived, bool? isFavorite, String? key, }) async {
+    final response = await getByTimeBucketWithHttpInfo(size, timeBucket,  userId: userId, albumId: albumId, isArchived: isArchived, isFavorite: isFavorite, key: key, );
     if (response.statusCode >= HttpStatus.badRequest) {
       throw ApiException(response.statusCode, await _decodeBodyBytes(response));
     }
@@ -113,7 +120,9 @@ class TimeBucketApi {
   /// * [bool] isArchived:
   ///
   /// * [bool] isFavorite:
-  Future<Response> getTimeBucketsWithHttpInfo(TimeBucketSize size, { String? userId, String? albumId, bool? isArchived, bool? isFavorite, }) async {
+  ///
+  /// * [String] key:
+  Future<Response> getTimeBucketsWithHttpInfo(TimeBucketSize size, { String? userId, String? albumId, bool? isArchived, bool? isFavorite, String? key, }) async {
     // ignore: prefer_const_declarations
     final path = r'/time-bucket';
 
@@ -136,6 +145,9 @@ class TimeBucketApi {
     }
     if (isFavorite != null) {
       queryParams.addAll(_queryParams('', 'isFavorite', isFavorite));
+    }
+    if (key != null) {
+      queryParams.addAll(_queryParams('', 'key', key));
     }
 
     const contentTypes = <String>[];
@@ -163,8 +175,10 @@ class TimeBucketApi {
   /// * [bool] isArchived:
   ///
   /// * [bool] isFavorite:
-  Future<List<TimeBucketResponseDto>?> getTimeBuckets(TimeBucketSize size, { String? userId, String? albumId, bool? isArchived, bool? isFavorite, }) async {
-    final response = await getTimeBucketsWithHttpInfo(size,  userId: userId, albumId: albumId, isArchived: isArchived, isFavorite: isFavorite, );
+  ///
+  /// * [String] key:
+  Future<List<TimeBucketResponseDto>?> getTimeBuckets(TimeBucketSize size, { String? userId, String? albumId, bool? isArchived, bool? isFavorite, String? key, }) async {
+    final response = await getTimeBucketsWithHttpInfo(size,  userId: userId, albumId: albumId, isArchived: isArchived, isFavorite: isFavorite, key: key, );
     if (response.statusCode >= HttpStatus.badRequest) {
       throw ApiException(response.statusCode, await _decodeBodyBytes(response));
     }

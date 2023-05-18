@@ -17,6 +17,7 @@ export class TimeBucketService {
   }
 
   async getAll(authUser: AuthUserDto, dto: TimeBucketDto): Promise<TimeBucketResponseDto[]> {
+    // TODO: shared link access
     const { userId, ...options } = dto;
     const targetId = userId || authUser.id;
     await this.checkUserAccess(authUser, targetId);
@@ -24,6 +25,7 @@ export class TimeBucketService {
   }
 
   async getAssets(authUser: AuthUserDto, dto: TimeBucketAssetDto): Promise<AssetResponseDto[]> {
+    // TODO: shared link access
     const { userId, timeBucket, ...options } = dto;
     const targetId = userId || authUser.id;
     await this.checkUserAccess(authUser, targetId);

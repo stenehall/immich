@@ -17,7 +17,7 @@
 
 {#if sharedLink.type == SharedLinkType.Album && album}
 	<div class="immich-scrollbar">
-		<AlbumViewer {album} {sharedLink} />
+		<AlbumViewer {album} {sharedLink} startDate={data.startDate} endDate={data.endDate} />
 	</div>
 {/if}
 

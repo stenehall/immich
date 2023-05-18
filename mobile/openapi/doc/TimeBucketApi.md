@@ -14,7 +14,7 @@ Method | HTTP request | Description
 
 
 # **getByTimeBucket**
-> List<AssetResponseDto> getByTimeBucket(size, timeBucket, userId, albumId, isArchived, isFavorite)
+> List<AssetResponseDto> getByTimeBucket(size, timeBucket, userId, albumId, isArchived, isFavorite, key)
 
 
 
@@ -43,9 +43,10 @@ final userId = 38400000-8cf0-11bd-b23e-10b96e4ef00d; // String |
 final albumId = 38400000-8cf0-11bd-b23e-10b96e4ef00d; // String | 
 final isArchived = true; // bool | 
 final isFavorite = true; // bool | 
+final key = key_example; // String | 
 
 try {
-    final result = api_instance.getByTimeBucket(size, timeBucket, userId, albumId, isArchived, isFavorite);
+    final result = api_instance.getByTimeBucket(size, timeBucket, userId, albumId, isArchived, isFavorite, key);
     print(result);
 } catch (e) {
     print('Exception when calling TimeBucketApi->getByTimeBucket: $e\n');
@@ -62,6 +63,7 @@ Name | Type | Description  | Notes
  **albumId** | **String**|  | [optional] 
  **isArchived** | **bool**|  | [optional] 
  **isFavorite** | **bool**|  | [optional] 
+ **key** | **String**|  | [optional] 
 
 ### Return type
 
@@ -79,7 +81,7 @@ Name | Type | Description  | Notes
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **getTimeBuckets**
-> List<TimeBucketResponseDto> getTimeBuckets(size, userId, albumId, isArchived, isFavorite)
+> List<TimeBucketResponseDto> getTimeBuckets(size, userId, albumId, isArchived, isFavorite, key)
 
 
 
@@ -107,9 +109,10 @@ final userId = 38400000-8cf0-11bd-b23e-10b96e4ef00d; // String |
 final albumId = 38400000-8cf0-11bd-b23e-10b96e4ef00d; // String | 
 final isArchived = true; // bool | 
 final isFavorite = true; // bool | 
+final key = key_example; // String | 
 
 try {
-    final result = api_instance.getTimeBuckets(size, userId, albumId, isArchived, isFavorite);
+    final result = api_instance.getTimeBuckets(size, userId, albumId, isArchived, isFavorite, key);
     print(result);
 } catch (e) {
     print('Exception when calling TimeBucketApi->getTimeBuckets: $e\n');
@@ -125,6 +128,7 @@ Name | Type | Description  | Notes
  **albumId** | **String**|  | [optional] 
  **isArchived** | **bool**|  | [optional] 
  **isFavorite** | **bool**|  | [optional] 
+ **key** | **String**|  | [optional] 
 
 ### Return type
 

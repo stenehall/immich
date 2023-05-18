@@ -112,7 +112,13 @@ export class ImmichApi {
 	}
 
 	public getTimeBucketOptions(options: AssetGridOptions) {
-		return [options.userId, options.albumId, options.isArchived, options.isFavorite] as const;
+		return [
+			options.userId,
+			options.albumId,
+			options.isArchived,
+			options.isFavorite,
+			options.sharedKey
+		] as const;
 	}
 }
 
