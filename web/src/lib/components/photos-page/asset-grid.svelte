@@ -35,9 +35,7 @@
 	onMount(async () => {
 		const { data } = await api.timeBucketApi.getTimeBuckets(
 			options.size,
-			options.userId,
-			options.isArchived,
-			options.isFavorite
+			...api.getTimeBucketOptions(options)
 		);
 
 		timeBuckets = data;

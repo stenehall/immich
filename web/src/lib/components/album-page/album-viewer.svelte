@@ -10,6 +10,7 @@
 		AssetResponseDto,
 		SharedLinkResponseDto,
 		SharedLinkType,
+		TimeBucketSize,
 		UserResponseDto,
 		api
 	} from '@api';
@@ -21,17 +22,22 @@
 	import FolderDownloadOutline from 'svelte-material-icons/FolderDownloadOutline.svelte';
 	import Plus from 'svelte-material-icons/Plus.svelte';
 	import ShareVariantOutline from 'svelte-material-icons/ShareVariantOutline.svelte';
+	import {
+		assetInteractionStore,
+		isMultiSelectStoreState,
+		selectedAssets
+	} from '../../stores/asset-interaction.store';
 	import Button from '../elements/buttons/button.svelte';
 	import CircleIconButton from '../elements/buttons/circle-icon-button.svelte';
 	import DownloadFiles from '../photos-page/actions/download-files.svelte';
 	import RemoveFromAlbum from '../photos-page/actions/remove-from-album.svelte';
+	import AssetGrid from '../photos-page/asset-grid.svelte';
 	import AssetSelectControlBar from '../photos-page/asset-select-control-bar.svelte';
 	import CircleAvatar from '../shared-components/circle-avatar.svelte';
 	import ContextMenu from '../shared-components/context-menu/context-menu.svelte';
 	import MenuOption from '../shared-components/context-menu/menu-option.svelte';
 	import ControlAppBar from '../shared-components/control-app-bar.svelte';
 	import CreateSharedLinkModal from '../shared-components/create-share-link-modal/create-shared-link-modal.svelte';
-	import GalleryViewer from '../shared-components/gallery-viewer/gallery-viewer.svelte';
 	import ImmichLogo from '../shared-components/immich-logo.svelte';
 	import {
 		NotificationType,
@@ -47,7 +53,6 @@
 	export let sharedLink: SharedLinkResponseDto | undefined = undefined;
 
 	let isShowAssetSelection = false;
-
 	let isShowShareLinkModal = false;
 
 	$: {
@@ -71,12 +76,12 @@
 	let currentUser: UserResponseDto;
 	let titleInput: HTMLInputElement;
 	let contextMenuPosition = { x: 0, y: 0 };
+	let empty = false;
 
 	$: isPublicShared = sharedLink;
 	$: isOwned = currentUser?.id == album.ownerId;
 
 	let multiSelectAsset: Set<AssetResponseDto> = new Set();
-	$: isMultiSelectionMode = multiSelectAsset.size > 0;
 
 	afterNavigate(({ from }) => {
 		backUrl = from?.url.pathname ?? '/albums';
@@ -328,21 +333,17 @@
 </script>
 
 <section class="bg-immich-bg dark:bg-immich-dark-bg" class:hidden={isShowThumbnailSelection}>
-	<!-- Multiselection mode app bar -->
-	{#if isMultiSelectionMode}
+	{#if $isMultiSelectStoreState}
 		<AssetSelectControlBar
-			assets={multiSelectAsset}
-			clearSelect={() => (multiSelectAsset = new Set())}
+			assets={$selectedAssets}
+			clearSelect={assetInteractionStore.clearMultiselect}
 		>
 			<DownloadFiles filename={album.albumName} sharedLinkKey={sharedLink?.key} />
 			{#if isOwned}
 				<RemoveFromAlbum bind:album />
 			{/if}
 		</AssetSelectControlBar>
-	{/if}
-
-	<!-- Default app bar -->
-	{#if !isMultiSelectionMode}
+	{:else}
 		<ControlAppBar
 			on:close-button-click={() => goto(backUrl)}
 			backIcon={ArrowLeft}
@@ -490,7 +491,7 @@
 		{/if}
 
 		{#if album.assetCount > 0}
-			<GalleryViewer assets={album.assets} {sharedLink} bind:selectedAssets={multiSelectAsset} />
+			<AssetGrid bind:empty options={{ albumId: album.id, size: TimeBucketSize.Month }} />
 		{:else}
 			<!-- Album is empty - Show asset selectection buttons -->
 			<section id="empty-album" class=" mt-[200px] flex place-content-center place-items-center">

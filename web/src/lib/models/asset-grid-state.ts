@@ -13,6 +13,7 @@ export class AssetBucket {
 
 export interface AssetGridOptions {
 	size: TimeBucketSize;
+	albumId?: string;
 	userId?: string;
 	isArchived?: boolean;
 	isFavorite?: boolean;

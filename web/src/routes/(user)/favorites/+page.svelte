@@ -5,21 +5,26 @@
 	import AssetGrid from '$lib/components/photos-page/asset-grid.svelte';
 	import AssetSelectControlBar from '$lib/components/photos-page/asset-select-control-bar.svelte';
 	import EmptyPlaceholder from '$lib/components/shared-components/empty-placeholder.svelte';
-	import { AssetResponseDto, TimeBucketSize } from '@api';
-	import { isMultiSelectStoreState } from '../../../lib/stores/asset-interaction.store';
+	import { TimeBucketSize } from '@api';
+	import {
+		assetInteractionStore,
+		isMultiSelectStoreState,
+		selectedAssets
+	} from '$lib/stores/asset-interaction.store';
 	import type { PageData } from './$types';
 
-	let selectedAssets: Set<AssetResponseDto> = new Set();
 	let empty = false;
 
 	export let data: PageData;
 </script>
 
-<!-- Multiselection mode app bar -->
 {#if $isMultiSelectStoreState}
-	<AssetSelectControlBar assets={selectedAssets} clearSelect={() => (selectedAssets = new Set())}>
+	<AssetSelectControlBar
+		assets={$selectedAssets}
+		clearSelect={assetInteractionStore.clearMultiselect}
+	>
 		<CreateSharedLink />
-		<RemoveFavorite onAssetFavorite={(asset) => {}} />
+		<RemoveFavorite />
 	</AssetSelectControlBar>
 {/if}
 

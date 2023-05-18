@@ -1,3 +1,4 @@
+import { AssetGridOptions } from '../lib/models/asset-grid-state';
 import {
 	AlbumApi,
 	APIKeyApi,
@@ -108,6 +109,10 @@ export class ImmichApi {
 	public getPeopleThumbnailUrl(personId: string) {
 		const path = `/person/${personId}/thumbnail`;
 		return this.createUrl(path);
+	}
+
+	public getTimeBucketOptions(options: AssetGridOptions) {
+		return [options.userId, options.albumId, options.isArchived, options.isFavorite] as const;
 	}
 }
 

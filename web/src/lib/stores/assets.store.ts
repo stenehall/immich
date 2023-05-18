@@ -64,9 +64,7 @@ function createAssetStore() {
 			const { data: assets } = await api.timeBucketApi.getByTimeBucket(
 				TimeBucketSize.Month,
 				bucket,
-				_assetGridState.options.userId,
-				_assetGridState.options.isArchived,
-				_assetGridState.options.isFavorite,
+				...api.getTimeBucketOptions(_assetGridState.options),
 				{ signal: currentBucketData?.cancelToken.signal }
 			);
 			loadingBucketState.set({
