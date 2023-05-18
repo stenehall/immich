@@ -14,6 +14,7 @@ export interface TimeBucketOptions {
   size: TimeBucketSize;
   isArchived?: boolean;
   isFavorite?: boolean;
+  albumId?: string;
 }
 
 export interface LivePhotoSearchOptions {

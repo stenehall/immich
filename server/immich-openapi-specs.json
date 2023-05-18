@@ -1612,6 +1612,15 @@
             }
           },
           {
+            "name": "albumId",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
             "name": "isArchived",
             "required": false,
             "in": "query",
@@ -1673,6 +1682,15 @@
           },
           {
             "name": "userId",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "albumId",
             "required": false,
             "in": "query",
             "schema": {

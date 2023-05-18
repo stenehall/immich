@@ -16,6 +16,12 @@ export class TimeBucketDto {
   userId?: string;
 
   @IsOptional()
+  @IsUUID()
+  @IsUUID('4')
+  @ApiProperty({ format: 'uuid' })
+  albumId?: string;
+
+  @IsOptional()
   @IsBoolean()
   @Transform(toBoolean)
   isArchived?: boolean;
