@@ -27,6 +27,8 @@
 
 	$: empty = timeBuckets.length === 0;
 
+	const MIN_OVERFLOW_THRESHOLD = 100;
+
 	let viewportHeight = 0;
 	let viewportWidth = 0;
 	let assetGridElement: HTMLElement;
@@ -109,7 +111,7 @@
 	};
 </script>
 
-{#if timeBuckets.length > 0 && viewportHeight && viewportHeight < $assetGridState.timelineHeight}
+{#if timeBuckets.length > 0 && viewportHeight && viewportHeight + MIN_OVERFLOW_THRESHOLD < $assetGridState.timelineHeight}
 	<Scrollbar
 		scrollbarHeight={viewportHeight}
 		scrollTop={lastScrollPosition}
@@ -120,7 +122,7 @@
 
 <section
 	id="asset-grid"
-	class="overflow-y-auto pl-4 scrollbar-hidden h-full"
+	class="overflow-y-auto pl-4 scrollbar-hidden h-full pb-8"
 	bind:clientHeight={viewportHeight}
 	bind:clientWidth={viewportWidth}
 	bind:this={assetGridElement}
