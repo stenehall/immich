@@ -102,11 +102,7 @@
 <section class="relative pt-8 sm:px-4 mb-12 bg-immich-bg dark:bg-immich-dark-bg">
 	<section class="overflow-y-auto relative immich-scrollbar">
 		<section id="search-content" class="relative bg-immich-bg dark:bg-immich-dark-bg">
-			<GalleryViewer
-				assets={data.assets}
-				showArchiveIcon={true}
-				bind:selectedAssets={multiSelectAsset}
-			/>
+			<GalleryViewer assets={data.assets} bind:selectedAssets={multiSelectAsset} />
 		</section>
 	</section>
 </section>

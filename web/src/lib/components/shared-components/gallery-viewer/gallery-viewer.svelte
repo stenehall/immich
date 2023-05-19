@@ -11,7 +11,6 @@
 	export let sharedLink: SharedLinkResponseDto | undefined = undefined;
 	export let selectedAssets: Set<AssetResponseDto> = new Set();
 	export let disableAssetSelect = false;
-	export let showArchiveIcon = false;
 
 	let isShowAssetViewer = false;
 
@@ -123,7 +122,6 @@
 						on:click={(e) => (isMultiSelectionMode ? selectAssetHandler(e) : viewAssetHandler(e))}
 						on:select={selectAssetHandler}
 						selected={selectedAssets.has(asset)}
-						{showArchiveIcon}
 					/>
 				</div>
 			{/each}

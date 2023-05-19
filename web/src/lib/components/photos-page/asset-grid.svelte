@@ -62,7 +62,7 @@
 		});
 	});
 
-	onDestroy(() => assetStore.setInitialState(0, 0, [], options));
+	onDestroy(() => assetStore.reset());
 
 	function intersectedHandler(event: CustomEvent) {
 		const el = event.detail as HTMLElement;

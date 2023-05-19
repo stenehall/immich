@@ -23,7 +23,6 @@
 	export let disabled = false;
 	export let readonly = false;
 	export let publicSharedKey: string | undefined = undefined;
-	export let showArchiveIcon = false;
 
 	let mouseOver = false;
 
@@ -109,18 +108,16 @@
 					class="absolute w-full h-full bg-gradient-to-b from-black/25 via-[transparent_25%] opacity-0 group-hover:opacity-100 transition-opacity z-10"
 				/>
 
-				<!-- Favorite asset star -->
-				{#if asset.isFavorite && !publicSharedKey}
-					<div class="absolute bottom-2 left-2 z-10">
+				<div class="flex gap-2 absolute bottom-2 left-2 z-10">
+					<!-- Favorite asset star -->
+					{#if asset.isFavorite && !publicSharedKey}
 						<Heart size="24" class="text-white" />
-					</div>
-				{/if}
+					{/if}
 
-				{#if showArchiveIcon && asset.isArchived}
-					<div class="absolute {asset.isFavorite ? 'bottom-10' : 'bottom-2'} left-2 z-10">
+					{#if asset.isArchived}
 						<ArchiveArrowDownOutline size="24" class="text-white" />
-					</div>
-				{/if}
+					{/if}
+				</div>
 				<ImageThumbnail
 					url={api.getAssetThumbnailUrl(asset.id, format, publicSharedKey)}
 					altText={asset.originalFileName}

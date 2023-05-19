@@ -4,22 +4,22 @@
 		NotificationType,
 		notificationController
 	} from '$lib/components/shared-components/notification/notification';
-	import { AlbumResponseDto, api } from '@api';
+	import { api } from '@api';
 	import DeleteOutline from 'svelte-material-icons/DeleteOutline.svelte';
-	import { getAssetControlContext } from '../asset-select-control-bar.svelte';
+	import { OnAssetDelete, getAssetControlContext } from '../asset-select-control-bar.svelte';
 
-	export let album: AlbumResponseDto;
+	export let albumId: string;
+	export let onAssetDelete: OnAssetDelete;
 
 	const { getAssets, clearSelect } = getAssetControlContext();
 
 	const handleRemoveFromAlbum = async () => {
 		if (window.confirm('Do you want to remove selected assets from the album?')) {
 			try {
-				const { data } = await api.albumApi.removeAssetFromAlbum(album.id, {
-					assetIds: Array.from(getAssets()).map((a) => a.id)
-				});
+				const assetIds = Array.from(getAssets()).map((a) => a.id);
+				await api.albumApi.removeAssetFromAlbum(albumId, { assetIds });
 
-				album = data;
+				assetIds.forEach(onAssetDelete);
 				clearSelect();
 			} catch (e) {
 				console.error('Error [album-viewer] [removeAssetFromAlbum]', e);

@@ -82,7 +82,7 @@
 		<section id="search-content" class="relative bg-immich-bg dark:bg-immich-dark-bg">
 			{#if data.results?.assets?.items.length > 0}
 				<div class="pl-4">
-					<GalleryViewer assets={searchResultAssets} bind:selectedAssets showArchiveIcon={true} />
+					<GalleryViewer assets={searchResultAssets} bind:selectedAssets />
 				</div>
 			{:else}
 				<div

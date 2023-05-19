@@ -12,8 +12,15 @@ export const load = (async ({ params, locals: { api, user } }) => {
 	try {
 		const { data: album } = await api.albumApi.getAlbumInfo(albumId);
 
-		const startDate = new Date(album.assets[0].fileCreatedAt);
-		const endDate = new Date(album.assets[album.assetCount - 1].fileCreatedAt);
+		const getFileCreatedAt = (index: number) => {
+			const asset = album.assets?.[index];
+			if (asset) {
+				return new Date(asset.fileCreatedAt);
+			}
+		};
+
+		const startDate = getFileCreatedAt(0);
+		const endDate = getFileCreatedAt(album.assetCount - 1);
 
 		album.assets = [];
 

@@ -14,8 +14,13 @@ function createAssetStore() {
 	let _assetGridState = new AssetGridState();
 	assetGridState.subscribe((state) => (_assetGridState = state));
 
-	let _loadingBucketState: { [key: string]: boolean } = {};
-	loadingBucketState.subscribe((state) => (_loadingBucketState = state));
+	const reset = () => {
+		for (const bucket of _assetGridState.buckets) {
+			bucket.cancelToken.abort();
+		}
+
+		assetGridState.set(new AssetGridState());
+	};
 
 	/**
 	 * Set initial state
@@ -56,21 +61,12 @@ function createAssetStore() {
 			if (currentBucketData?.assets && currentBucketData.assets.length > 0) {
 				return;
 			}
-
-			loadingBucketState.set({
-				..._loadingBucketState,
-				[bucket]: true
-			});
 			const { data: assets } = await api.timeBucketApi.getByTimeBucket(
 				TimeBucketSize.Month,
 				bucket,
 				...api.getTimeBucketOptions(_assetGridState.options),
 				{ signal: currentBucketData?.cancelToken.signal }
 			);
-			loadingBucketState.set({
-				..._loadingBucketState,
-				[bucket]: false
-			});
 
 			// Update assetGridState with assets by time bucket
 			assetGridState.update((state) => {
@@ -152,6 +148,7 @@ function createAssetStore() {
 	};
 
 	return {
+		reset,
 		setInitialState,
 		getAssetsByBucket,
 		removeAsset,

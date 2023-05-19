@@ -5,12 +5,13 @@
 	import AssetGrid from '$lib/components/photos-page/asset-grid.svelte';
 	import AssetSelectControlBar from '$lib/components/photos-page/asset-select-control-bar.svelte';
 	import EmptyPlaceholder from '$lib/components/shared-components/empty-placeholder.svelte';
-	import { TimeBucketSize } from '@api';
 	import {
 		assetInteractionStore,
 		isMultiSelectStoreState,
 		selectedAssets
 	} from '$lib/stores/asset-interaction.store';
+	import { assetStore } from '$lib/stores/assets.store';
+	import { TimeBucketSize } from '@api';
 	import type { PageData } from './$types';
 
 	let empty = false;
@@ -24,7 +25,7 @@
 		clearSelect={assetInteractionStore.clearMultiselect}
 	>
 		<CreateSharedLink />
-		<RemoveFavorite />
+		<RemoveFavorite onAssetFavorite={(asset) => assetStore.removeAsset(asset.id)} />
 	</AssetSelectControlBar>
 {/if}
 

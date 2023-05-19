@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { browser } from '$app/environment';
 	import { afterNavigate, goto } from '$app/navigation';
+	import { assetStore } from '$lib/stores/assets.store';
 	import { downloadAssets } from '$lib/stores/download';
 	import { locale } from '$lib/stores/preferences.store';
 	import { clickOutside } from '$lib/utils/click-outside';
@@ -337,7 +338,7 @@
 		>
 			<DownloadFiles filename={album.albumName} sharedLinkKey={sharedLink?.key} />
 			{#if isOwned}
-				<RemoveFromAlbum bind:album />
+				<RemoveFromAlbum albumId={album.id} onAssetDelete={assetStore.removeAsset} />
 			{/if}
 		</AssetSelectControlBar>
 	{:else}
@@ -487,15 +488,28 @@
 			</div>
 		{/if}
 
-		{#if album.assetCount > 0}
-			<AssetGrid
-				bind:empty
-				options={{
-					size: TimeBucketSize.Month,
-					albumId: album.id,
-					sharedKey: sharedLink?.key
-				}}
-			/>
+		{#if !isShowAssetSelection}
+			<!--
+				TODO: Find better solution for problem below
+	
+				Workaround to prevent AssetGrid from being rendered simultaneously
+				in multiple places. AssetSelection also renders AssetGrid and that
+				causes issues with the global state in stores. This component also
+				has a transition duration of 100ms on which we have to wait to make
+				sure it unmounts first.
+			-->
+			{#await new Promise((resolve) => setTimeout(resolve, 100)) then}
+				{#if album.assetCount > 0}
+					<AssetGrid
+						bind:empty
+						options={{
+							size: TimeBucketSize.Month,
+							albumId: album.id,
+							sharedKey: sharedLink?.key
+						}}
+					/>
+				{/if}
+			{/await}
 		{:else}
 			<!-- Album is empty - Show asset selectection buttons -->
 			<section id="empty-album" class=" mt-[200px] flex place-content-center place-items-center">
