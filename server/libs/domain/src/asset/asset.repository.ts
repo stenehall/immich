@@ -24,6 +24,16 @@ export interface LivePhotoSearchOptions {
   type: AssetType;
 }
 
+export interface MapMarkerSearchOptions {
+  isFavorite?: boolean;
+}
+
+export interface MapMarker {
+  id: string;
+  lat: number;
+  lon: number;
+}
+
 export enum WithoutProperty {
   THUMBNAIL = 'thumbnail',
   ENCODED_VIDEO = 'encoded-video',
@@ -48,6 +58,7 @@ export interface IAssetRepository {
   getAll(options?: AssetSearchOptions): Promise<AssetEntity[]>;
   save(asset: Partial<AssetEntity>): Promise<AssetEntity>;
   findLivePhotoMatch(options: LivePhotoSearchOptions): Promise<AssetEntity | null>;
+  getMapMarkers(ownerId: string, options?: MapMarkerSearchOptions): Promise<MapMarker[]>;
   getTimeBuckets(userId: string, options: TimeBucketOptions): Promise<TimeBucketItem[]>;
   getByTimeBucket(userId: string, timeBucket: string, options: TimeBucketOptions): Promise<AssetEntity[]>;
 }
