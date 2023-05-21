@@ -47,7 +47,7 @@
 		clearSelect={() => (multiSelectAsset = new Set())}
 	>
 		<CreateSharedLink />
-		<MoveToArchive />
+		<MoveToArchive onAssetArchive={(asset) => handleAssetDelete(asset.id)} />
 		<DownloadFiles filename={data.person.name} />
 		<AssetSelectContextMenu icon={Plus} title="Add">
 			<OptionAddToFavorites />

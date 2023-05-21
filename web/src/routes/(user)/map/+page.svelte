@@ -28,8 +28,6 @@
 
 	onDestroy(() => {
 		abortController.abort();
-		assetInteractionStore.clearMultiselect();
-		assetInteractionStore.setIsViewingAsset(false);
 	});
 
 	async function loadMapMarkers() {

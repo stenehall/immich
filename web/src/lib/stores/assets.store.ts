@@ -1,14 +1,18 @@
 import { AssetGridOptions, AssetGridState } from '$lib/models/asset-grid-state';
 import { calculateViewportHeightByNumberOfAsset } from '$lib/utils/viewport-utils';
-import { api, TimeBucketResponseDto, TimeBucketSize } from '@api';
+import { api, TimeBucketResponseDto } from '@api';
 import { flatMap, sumBy } from 'lodash-es';
-import { writable } from 'svelte/store';
+import { derived, writable } from 'svelte/store';
 
 /**
  * The state that holds information about the asset grid
  */
 export const assetGridState = writable<AssetGridState>(new AssetGridState());
 export const loadingBucketState = writable<{ [key: string]: boolean }>({});
+export const assetGridEmpty = derived(
+	assetGridState,
+	(state) => state.initialized && state.buckets.length === 0
+);
 
 function createAssetStore() {
 	let _assetGridState = new AssetGridState();
@@ -35,6 +39,7 @@ function createAssetStore() {
 		options: AssetGridOptions
 	) => {
 		assetGridState.set({
+			initialized: true,
 			viewportHeight,
 			viewportWidth,
 			timelineHeight: 0,
@@ -62,7 +67,7 @@ function createAssetStore() {
 				return;
 			}
 			const { data: assets } = await api.timeBucketApi.getByTimeBucket(
-				TimeBucketSize.Month,
+				_assetGridState.options.size,
 				bucket,
 				...api.getTimeBucketOptions(_assetGridState.options),
 				{ signal: currentBucketData?.cancelToken.signal }

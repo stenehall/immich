@@ -12,8 +12,15 @@ export const load = (async ({ params, locals: { api } }) => {
 		const assetCount = sharedLink.assets.length;
 		const assetId = sharedLink.album?.albumThumbnailAssetId || sharedLink.assets[0]?.id;
 
-		const startDate = new Date(sharedLink.assets[0].fileCreatedAt);
-		const endDate = new Date(sharedLink.assets[assetCount - 1].fileCreatedAt);
+		const getFileCreatedAt = (index: number) => {
+			const asset = sharedLink.assets?.[index];
+			if (asset) {
+				return new Date(asset.fileCreatedAt);
+			}
+		};
+
+		const startDate = getFileCreatedAt(0);
+		const endDate = getFileCreatedAt(sharedLink.assets.length - 1);
 
 		return {
 			sharedLink,

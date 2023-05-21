@@ -40,7 +40,7 @@
 			text="Add favorites to quickly find your best pictures and videos"
 			alt="Empty favorites"
 		/>
+	{:else}
+		<AssetGrid bind:empty options={{ isFavorite: true, size: TimeBucketSize.Month }} />
 	{/if}
-
-	<AssetGrid bind:empty options={{ isFavorite: true, size: TimeBucketSize.Month }} />
 </UserPageLayout>

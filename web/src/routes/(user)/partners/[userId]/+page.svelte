@@ -11,15 +11,10 @@
 		selectedAssets
 	} from '$lib/stores/asset-interaction.store';
 	import { TimeBucketSize } from '@api';
-	import { onDestroy } from 'svelte';
 	import ArrowLeft from 'svelte-material-icons/ArrowLeft.svelte';
 	import type { PageData } from './$types';
 
 	export let data: PageData;
-
-	onDestroy(() => {
-		assetInteractionStore.clearMultiselect();
-	});
 </script>
 
 <main class="grid h-screen pt-18 bg-immich-bg dark:bg-immich-dark-bg">

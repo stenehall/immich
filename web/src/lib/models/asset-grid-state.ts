@@ -21,6 +21,8 @@ export interface AssetGridOptions {
 }
 
 export class AssetGridState {
+	initialized = false;
+
 	/**
 	 * The total height of the timeline in pixel
 	 * This value is first estimated by the number of asset and later is corrected as the user scroll

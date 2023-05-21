@@ -20,6 +20,7 @@
 	export let bucketDate: string;
 	export let bucketHeight: number;
 	export let isAlbumSelectionMode = false;
+	export let sharedKey: string | undefined = undefined;
 
 	const groupDateFormat: Intl.DateTimeFormatOptions = {
 		weekday: 'short',
@@ -162,6 +163,7 @@
 						<Thumbnail
 							{asset}
 							{groupIndex}
+							publicSharedKey={sharedKey}
 							on:click={() => assetClickHandler(asset, assetsInDateGroup, dateGroupTitle)}
 							on:select={() => assetSelectHandler(asset, assetsInDateGroup, dateGroupTitle)}
 							on:mouse-event={() => assetMouseEventHandler(dateGroupTitle)}

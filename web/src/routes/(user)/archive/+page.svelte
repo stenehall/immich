@@ -36,6 +36,8 @@
 			text="Archive photos and videos to hide them from your Photos view"
 			alt="Empty archive"
 		/>
+	{:else}
+		<AssetGrid bind:empty options={{ isArchived: true, size: TimeBucketSize.Month }} />
 	{/if}
 
 	<svelte:fragment slot="header">
@@ -56,6 +58,4 @@
 			</AssetSelectControlBar>
 		{/if}
 	</svelte:fragment>
-
-	<AssetGrid bind:empty options={{ isArchived: true, size: TimeBucketSize.Month }} />
 </UserPageLayout>

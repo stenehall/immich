@@ -6,7 +6,12 @@
 		isViewingAssetStoreState,
 		viewingAssetStoreState
 	} from '$lib/stores/asset-interaction.store';
-	import { assetGridState, assetStore, loadingBucketState } from '$lib/stores/assets.store';
+	import {
+		assetGridEmpty,
+		assetGridState,
+		assetStore,
+		loadingBucketState
+	} from '$lib/stores/assets.store';
 	import { AssetResponseDto, TimeBucketResponseDto, TimeBucketSize, api } from '@api';
 	import { AssetGridOptions } from '../../models/asset-grid-state';
 	import AssetViewer from '../asset-viewer/asset-viewer.svelte';
@@ -23,9 +28,8 @@
 		size: TimeBucketSize.Month
 	};
 
-	export let empty = true;
-
-	$: empty = timeBuckets.length === 0;
+	export let empty = false;
+	$: empty = $assetGridEmpty;
 
 	const MIN_OVERFLOW_THRESHOLD = 100;
 
@@ -62,7 +66,11 @@
 		});
 	});
 
-	onDestroy(() => assetStore.reset());
+	onDestroy(() => {
+		assetStore.reset();
+		assetInteractionStore.clearMultiselect();
+		assetInteractionStore.setIsViewingAsset(false);
+	});
 
 	function intersectedHandler(event: CustomEvent) {
 		const el = event.detail as HTMLElement;
@@ -151,6 +159,7 @@
 								assets={bucket.assets}
 								bucketDate={bucket.bucketDate}
 								bucketHeight={bucket.bucketHeight}
+								sharedKey={options.sharedKey}
 							/>
 						{/if}
 					</div>
