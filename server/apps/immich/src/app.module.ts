@@ -19,7 +19,6 @@ import {
   ServerInfoController,
   SharedLinkController,
   SystemConfigController,
-  TimeBucketController,
   UserController,
 } from './controllers';
 import { APP_GUARD } from '@nestjs/core';
@@ -47,7 +46,6 @@ import { AppCronJobs } from './app.cron-jobs';
     ServerInfoController,
     SharedLinkController,
     SystemConfigController,
-    TimeBucketController,
     UserController,
     PersonController,
   ],

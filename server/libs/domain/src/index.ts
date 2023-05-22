@@ -23,6 +23,5 @@ export * from './storage';
 export * from './storage-template';
 export * from './system-config';
 export * from './tag';
-export * from './time-bucket';
 export * from './user';
 export * from './user-token';

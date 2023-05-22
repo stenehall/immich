@@ -22,18 +22,18 @@ export class ServerInfoController {
     return this.service.getInfo();
   }
 
-  @Get('/ping')
+  @Get('ping')
   pingServer(): ServerPingResponse {
     return this.service.ping();
   }
 
-  @Get('/version')
+  @Get('version')
   getServerVersion(): ServerVersionReponseDto {
     return this.service.getVersion();
   }
 
   @Authenticated({ admin: true })
-  @Get('/stats')
+  @Get('stats')
   getStats(): Promise<ServerStatsResponseDto> {
     return this.service.getStats();
   }

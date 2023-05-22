@@ -16,7 +16,7 @@ export class JobController {
     return this.service.getAllJobsStatus();
   }
 
-  @Put('/:jobId')
+  @Put(':jobId')
   async sendJobCommand(@Param() { jobId }: JobIdDto, @Body() dto: JobCommandDto): Promise<JobStatusDto> {
     await this.service.handleCommand(jobId, dto);
     return await this.service.getJobStatus(jobId);

@@ -1,8 +1,8 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Transform } from 'class-transformer';
 import { IsBoolean, IsEnum, IsNotEmpty, IsOptional, IsString, IsUUID } from 'class-validator';
-import { toBoolean } from '../../../../apps/immich/src/utils/transform.util';
-import { TimeBucketSize } from '../asset';
+import { toBoolean } from '../../../../../apps/immich/src/utils/transform.util';
+import { TimeBucketSize } from '..';
 
 export class TimeBucketDto {
   @IsNotEmpty()

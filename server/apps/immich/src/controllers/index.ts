@@ -10,5 +10,4 @@ export * from './search.controller';
 export * from './server-info.controller';
 export * from './shared-link.controller';
 export * from './system-config.controller';
-export * from './time-bucket.controller';
 export * from './user.controller';
