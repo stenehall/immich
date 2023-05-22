@@ -41,6 +41,10 @@
 			alt="Empty favorites"
 		/>
 	{:else}
-		<AssetGrid bind:empty options={{ isFavorite: true, size: TimeBucketSize.Month }} />
+		<AssetGrid
+			bind:empty
+			options={{ isFavorite: true, size: TimeBucketSize.Month }}
+			showFavorite={false}
+		/>
 	{/if}
 </UserPageLayout>

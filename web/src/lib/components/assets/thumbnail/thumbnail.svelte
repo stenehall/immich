@@ -23,6 +23,8 @@
 	export let disabled = false;
 	export let readonly = false;
 	export let publicSharedKey: string | undefined = undefined;
+	export let showArchive = true;
+	export let showFavorite = true;
 
 	let mouseOver = false;
 
@@ -110,11 +112,11 @@
 
 				<div class="flex gap-2 absolute bottom-2 left-2 z-10">
 					<!-- Favorite asset star -->
-					{#if asset.isFavorite && !publicSharedKey}
+					{#if asset.isFavorite && showFavorite && !publicSharedKey}
 						<Heart size="24" class="text-white" />
 					{/if}
 
-					{#if asset.isArchived}
+					{#if asset.isArchived && showArchive}
 						<ArchiveArrowDownOutline size="24" class="text-white" />
 					{/if}
 				</div>

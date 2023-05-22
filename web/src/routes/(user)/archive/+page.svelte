@@ -37,7 +37,11 @@
 			alt="Empty archive"
 		/>
 	{:else}
-		<AssetGrid bind:empty options={{ isArchived: true, size: TimeBucketSize.Month }} />
+		<AssetGrid
+			bind:empty
+			options={{ isArchived: true, size: TimeBucketSize.Month }}
+			showArchive={false}
+		/>
 	{/if}
 
 	<svelte:fragment slot="header">

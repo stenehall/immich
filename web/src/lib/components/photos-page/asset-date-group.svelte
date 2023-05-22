@@ -21,6 +21,8 @@
 	export let bucketHeight: number;
 	export let isAlbumSelectionMode = false;
 	export let sharedKey: string | undefined = undefined;
+	export let showArchive = true;
+	export let showFavorite = true;
 
 	const groupDateFormat: Intl.DateTimeFormatOptions = {
 		weekday: 'short',
@@ -162,6 +164,8 @@
 					<div animate:flip={{ duration: 300 }}>
 						<Thumbnail
 							{asset}
+							{showArchive}
+							{showFavorite}
 							{groupIndex}
 							publicSharedKey={sharedKey}
 							on:click={() => assetClickHandler(asset, assetsInDateGroup, dateGroupTitle)}

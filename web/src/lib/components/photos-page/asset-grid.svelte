@@ -37,6 +37,8 @@
 	let viewportWidth = 0;
 	let assetGridElement: HTMLElement;
 	export let timeBuckets: TimeBucketResponseDto[] = [];
+	export let showArchive = true;
+	export let showFavorite = true;
 
 	onMount(async () => {
 		const { data } = await api.assetApi.getTimeBuckets(
@@ -155,6 +157,8 @@
 					<div id={'bucket_' + bucket.bucketDate} style:height={bucket.bucketHeight + 'px'}>
 						{#if intersecting}
 							<AssetDateGroup
+								{showArchive}
+								{showFavorite}
 								{isAlbumSelectionMode}
 								assets={bucket.assets}
 								bucketDate={bucket.bucketDate}

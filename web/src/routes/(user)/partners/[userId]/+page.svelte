@@ -45,5 +45,7 @@
 			isArchived: false,
 			userId: data.partner.id
 		}}
+		showArchive={false}
+		showFavorite={false}
 	/>
 </main>
