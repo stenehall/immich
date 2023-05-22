@@ -1,7 +1,7 @@
 import { AssetEntity, AssetType } from '@app/infra/entities';
 import { ForbiddenException, Inject } from '@nestjs/common';
 import { AuthUserDto } from '../auth';
-import { IAssetUploadedJob, IJobRepository, JobName } from '../job';
+import { IAssetJob, IJobRepository, JobName } from '../job';
 import { IPartnerRepository, PartnerCore } from '../partner';
 import { AssetCore } from './asset.core';
 import { IAssetRepository } from './asset.repository';
@@ -22,7 +22,7 @@ export class AssetService {
     this.partnerCore = new PartnerCore(partnerRepository);
   }
 
-  async handleAssetUpload(data: IAssetUploadedJob) {
+  async handleAssetUpload(data: IAssetJob) {
     await this.jobRepository.queue({ name: JobName.GENERATE_JPEG_THUMBNAIL, data });
 
     if (data.asset.type == AssetType.VIDEO) {
