@@ -16,8 +16,7 @@ import {
 	ShareApi,
 	SystemConfigApi,
 	UserApi,
-	UserApiFp,
-	TimeBucketApi
+	UserApiFp
 } from './open-api';
 import { BASE_PATH } from './open-api/base';
 import { DUMMY_BASE_URL, toPathString } from './open-api/common';
@@ -36,7 +35,6 @@ export class ImmichApi {
 	public shareApi: ShareApi;
 	public personApi: PersonApi;
 	public systemConfigApi: SystemConfigApi;
-	public timeBucketApi: TimeBucketApi;
 	public userApi: UserApi;
 
 	private config: Configuration;
@@ -56,7 +54,6 @@ export class ImmichApi {
 		this.shareApi = new ShareApi(this.config);
 		this.personApi = new PersonApi(this.config);
 		this.systemConfigApi = new SystemConfigApi(this.config);
-		this.timeBucketApi = new TimeBucketApi(this.config);
 		this.userApi = new UserApi(this.config);
 	}
 

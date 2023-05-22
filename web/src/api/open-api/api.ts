@@ -4664,6 +4664,83 @@ export const AssetApiAxiosParamCreator = function (configuration?: Configuration
         },
         /**
          * 
+         * @param {TimeBucketSize} size 
+         * @param {string} timeBucket 
+         * @param {string} [userId] 
+         * @param {string} [albumId] 
+         * @param {boolean} [isArchived] 
+         * @param {boolean} [isFavorite] 
+         * @param {string} [key] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getByTimeBucket: async (size: TimeBucketSize, timeBucket: string, userId?: string, albumId?: string, isArchived?: boolean, isFavorite?: boolean, key?: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'size' is not null or undefined
+            assertParamExists('getByTimeBucket', 'size', size)
+            // verify required parameter 'timeBucket' is not null or undefined
+            assertParamExists('getByTimeBucket', 'timeBucket', timeBucket)
+            const localVarPath = `/asset/time-bucket`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication cookie required
+
+            // authentication api_key required
+            await setApiKeyToObject(localVarHeaderParameter, "x-api-key", configuration)
+
+            // authentication bearer required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            if (size !== undefined) {
+                localVarQueryParameter['size'] = size;
+            }
+
+            if (userId !== undefined) {
+                localVarQueryParameter['userId'] = userId;
+            }
+
+            if (albumId !== undefined) {
+                localVarQueryParameter['albumId'] = albumId;
+            }
+
+            if (isArchived !== undefined) {
+                localVarQueryParameter['isArchived'] = isArchived;
+            }
+
+            if (isFavorite !== undefined) {
+                localVarQueryParameter['isFavorite'] = isFavorite;
+            }
+
+            if (timeBucket !== undefined) {
+                localVarQueryParameter['timeBucket'] = timeBucket;
+            }
+
+            if (key !== undefined) {
+                localVarQueryParameter['key'] = key;
+            }
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -4768,6 +4845,76 @@ export const AssetApiAxiosParamCreator = function (configuration?: Configuration
 
             if (isFavorite !== undefined) {
                 localVarQueryParameter['isFavorite'] = isFavorite;
+            }
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @param {TimeBucketSize} size 
+         * @param {string} [userId] 
+         * @param {string} [albumId] 
+         * @param {boolean} [isArchived] 
+         * @param {boolean} [isFavorite] 
+         * @param {string} [key] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getTimeBuckets: async (size: TimeBucketSize, userId?: string, albumId?: string, isArchived?: boolean, isFavorite?: boolean, key?: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'size' is not null or undefined
+            assertParamExists('getTimeBuckets', 'size', size)
+            const localVarPath = `/asset/time-buckets`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication cookie required
+
+            // authentication api_key required
+            await setApiKeyToObject(localVarHeaderParameter, "x-api-key", configuration)
+
+            // authentication bearer required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            if (size !== undefined) {
+                localVarQueryParameter['size'] = size;
+            }
+
+            if (userId !== undefined) {
+                localVarQueryParameter['userId'] = userId;
+            }
+
+            if (albumId !== undefined) {
+                localVarQueryParameter['albumId'] = albumId;
+            }
+
+            if (isArchived !== undefined) {
+                localVarQueryParameter['isArchived'] = isArchived;
+            }
+
+            if (isFavorite !== undefined) {
+                localVarQueryParameter['isFavorite'] = isFavorite;
+            }
+
+            if (key !== undefined) {
+                localVarQueryParameter['key'] = key;
             }
 
 
@@ -5305,6 +5452,22 @@ export const AssetApiFp = function(configuration?: Configuration) {
         },
         /**
          * 
+         * @param {TimeBucketSize} size 
+         * @param {string} timeBucket 
+         * @param {string} [userId] 
+         * @param {string} [albumId] 
+         * @param {boolean} [isArchived] 
+         * @param {boolean} [isFavorite] 
+         * @param {string} [key] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getByTimeBucket(size: TimeBucketSize, timeBucket: string, userId?: string, albumId?: string, isArchived?: boolean, isFavorite?: boolean, key?: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<AssetResponseDto>>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getByTimeBucket(size, timeBucket, userId, albumId, isArchived, isFavorite, key, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -5329,6 +5492,21 @@ export const AssetApiFp = function(configuration?: Configuration) {
          */
         async getMapMarkers(isFavorite?: boolean, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<MapMarkerResponseDto>>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.getMapMarkers(isFavorite, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 
+         * @param {TimeBucketSize} size 
+         * @param {string} [userId] 
+         * @param {string} [albumId] 
+         * @param {boolean} [isArchived] 
+         * @param {boolean} [isFavorite] 
+         * @param {string} [key] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getTimeBuckets(size: TimeBucketSize, userId?: string, albumId?: string, isArchived?: boolean, isFavorite?: boolean, key?: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<TimeBucketResponseDto>>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getTimeBuckets(size, userId, albumId, isArchived, isFavorite, key, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
@@ -5555,6 +5733,21 @@ export const AssetApiFactory = function (configuration?: Configuration, basePath
         },
         /**
          * 
+         * @param {TimeBucketSize} size 
+         * @param {string} timeBucket 
+         * @param {string} [userId] 
+         * @param {string} [albumId] 
+         * @param {boolean} [isArchived] 
+         * @param {boolean} [isFavorite] 
+         * @param {string} [key] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getByTimeBucket(size: TimeBucketSize, timeBucket: string, userId?: string, albumId?: string, isArchived?: boolean, isFavorite?: boolean, key?: string, options?: any): AxiosPromise<Array<AssetResponseDto>> {
+            return localVarFp.getByTimeBucket(size, timeBucket, userId, albumId, isArchived, isFavorite, key, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -5577,6 +5770,20 @@ export const AssetApiFactory = function (configuration?: Configuration, basePath
          */
         getMapMarkers(isFavorite?: boolean, options?: any): AxiosPromise<Array<MapMarkerResponseDto>> {
             return localVarFp.getMapMarkers(isFavorite, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @param {TimeBucketSize} size 
+         * @param {string} [userId] 
+         * @param {string} [albumId] 
+         * @param {boolean} [isArchived] 
+         * @param {boolean} [isFavorite] 
+         * @param {string} [key] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getTimeBuckets(size: TimeBucketSize, userId?: string, albumId?: string, isArchived?: boolean, isFavorite?: boolean, key?: string, options?: any): AxiosPromise<Array<TimeBucketResponseDto>> {
+            return localVarFp.getTimeBuckets(size, userId, albumId, isArchived, isFavorite, key, options).then((request) => request(axios, basePath));
         },
         /**
          * Get all asset of a device that are in the database, ID only.
@@ -5824,6 +6031,23 @@ export class AssetApi extends BaseAPI {
 
     /**
      * 
+     * @param {TimeBucketSize} size 
+     * @param {string} timeBucket 
+     * @param {string} [userId] 
+     * @param {string} [albumId] 
+     * @param {boolean} [isArchived] 
+     * @param {boolean} [isFavorite] 
+     * @param {string} [key] 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof AssetApi
+     */
+    public getByTimeBucket(size: TimeBucketSize, timeBucket: string, userId?: string, albumId?: string, isArchived?: boolean, isFavorite?: boolean, key?: string, options?: AxiosRequestConfig) {
+        return AssetApiFp(this.configuration).getByTimeBucket(size, timeBucket, userId, albumId, isArchived, isFavorite, key, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof AssetApi
@@ -5851,6 +6075,22 @@ export class AssetApi extends BaseAPI {
      */
     public getMapMarkers(isFavorite?: boolean, options?: AxiosRequestConfig) {
         return AssetApiFp(this.configuration).getMapMarkers(isFavorite, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @param {TimeBucketSize} size 
+     * @param {string} [userId] 
+     * @param {string} [albumId] 
+     * @param {boolean} [isArchived] 
+     * @param {boolean} [isFavorite] 
+     * @param {string} [key] 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof AssetApi
+     */
+    public getTimeBuckets(size: TimeBucketSize, userId?: string, albumId?: string, isArchived?: boolean, isFavorite?: boolean, key?: string, options?: AxiosRequestConfig) {
+        return AssetApiFp(this.configuration).getTimeBuckets(size, userId, albumId, isArchived, isFavorite, key, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -9455,284 +9695,6 @@ export class TagApi extends BaseAPI {
      */
     public update(id: string, updateTagDto: UpdateTagDto, options?: AxiosRequestConfig) {
         return TagApiFp(this.configuration).update(id, updateTagDto, options).then((request) => request(this.axios, this.basePath));
-    }
-}
-
-
-/**
- * TimeBucketApi - axios parameter creator
- * @export
- */
-export const TimeBucketApiAxiosParamCreator = function (configuration?: Configuration) {
-    return {
-        /**
-         * 
-         * @param {TimeBucketSize} size 
-         * @param {string} timeBucket 
-         * @param {string} [userId] 
-         * @param {string} [albumId] 
-         * @param {boolean} [isArchived] 
-         * @param {boolean} [isFavorite] 
-         * @param {string} [key] 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        getByTimeBucket: async (size: TimeBucketSize, timeBucket: string, userId?: string, albumId?: string, isArchived?: boolean, isFavorite?: boolean, key?: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
-            // verify required parameter 'size' is not null or undefined
-            assertParamExists('getByTimeBucket', 'size', size)
-            // verify required parameter 'timeBucket' is not null or undefined
-            assertParamExists('getByTimeBucket', 'timeBucket', timeBucket)
-            const localVarPath = `/time-bucket/assets`;
-            // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
-            let baseOptions;
-            if (configuration) {
-                baseOptions = configuration.baseOptions;
-            }
-
-            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
-            const localVarHeaderParameter = {} as any;
-            const localVarQueryParameter = {} as any;
-
-            // authentication cookie required
-
-            // authentication api_key required
-            await setApiKeyToObject(localVarHeaderParameter, "x-api-key", configuration)
-
-            // authentication bearer required
-            // http bearer authentication required
-            await setBearerAuthToObject(localVarHeaderParameter, configuration)
-
-            if (size !== undefined) {
-                localVarQueryParameter['size'] = size;
-            }
-
-            if (userId !== undefined) {
-                localVarQueryParameter['userId'] = userId;
-            }
-
-            if (albumId !== undefined) {
-                localVarQueryParameter['albumId'] = albumId;
-            }
-
-            if (isArchived !== undefined) {
-                localVarQueryParameter['isArchived'] = isArchived;
-            }
-
-            if (isFavorite !== undefined) {
-                localVarQueryParameter['isFavorite'] = isFavorite;
-            }
-
-            if (timeBucket !== undefined) {
-                localVarQueryParameter['timeBucket'] = timeBucket;
-            }
-
-            if (key !== undefined) {
-                localVarQueryParameter['key'] = key;
-            }
-
-
-    
-            setSearchParams(localVarUrlObj, localVarQueryParameter);
-            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-
-            return {
-                url: toPathString(localVarUrlObj),
-                options: localVarRequestOptions,
-            };
-        },
-        /**
-         * 
-         * @param {TimeBucketSize} size 
-         * @param {string} [userId] 
-         * @param {string} [albumId] 
-         * @param {boolean} [isArchived] 
-         * @param {boolean} [isFavorite] 
-         * @param {string} [key] 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        getTimeBuckets: async (size: TimeBucketSize, userId?: string, albumId?: string, isArchived?: boolean, isFavorite?: boolean, key?: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
-            // verify required parameter 'size' is not null or undefined
-            assertParamExists('getTimeBuckets', 'size', size)
-            const localVarPath = `/time-bucket`;
-            // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
-            let baseOptions;
-            if (configuration) {
-                baseOptions = configuration.baseOptions;
-            }
-
-            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
-            const localVarHeaderParameter = {} as any;
-            const localVarQueryParameter = {} as any;
-
-            // authentication cookie required
-
-            // authentication api_key required
-            await setApiKeyToObject(localVarHeaderParameter, "x-api-key", configuration)
-
-            // authentication bearer required
-            // http bearer authentication required
-            await setBearerAuthToObject(localVarHeaderParameter, configuration)
-
-            if (size !== undefined) {
-                localVarQueryParameter['size'] = size;
-            }
-
-            if (userId !== undefined) {
-                localVarQueryParameter['userId'] = userId;
-            }
-
-            if (albumId !== undefined) {
-                localVarQueryParameter['albumId'] = albumId;
-            }
-
-            if (isArchived !== undefined) {
-                localVarQueryParameter['isArchived'] = isArchived;
-            }
-
-            if (isFavorite !== undefined) {
-                localVarQueryParameter['isFavorite'] = isFavorite;
-            }
-
-            if (key !== undefined) {
-                localVarQueryParameter['key'] = key;
-            }
-
-
-    
-            setSearchParams(localVarUrlObj, localVarQueryParameter);
-            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-
-            return {
-                url: toPathString(localVarUrlObj),
-                options: localVarRequestOptions,
-            };
-        },
-    }
-};
-
-/**
- * TimeBucketApi - functional programming interface
- * @export
- */
-export const TimeBucketApiFp = function(configuration?: Configuration) {
-    const localVarAxiosParamCreator = TimeBucketApiAxiosParamCreator(configuration)
-    return {
-        /**
-         * 
-         * @param {TimeBucketSize} size 
-         * @param {string} timeBucket 
-         * @param {string} [userId] 
-         * @param {string} [albumId] 
-         * @param {boolean} [isArchived] 
-         * @param {boolean} [isFavorite] 
-         * @param {string} [key] 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        async getByTimeBucket(size: TimeBucketSize, timeBucket: string, userId?: string, albumId?: string, isArchived?: boolean, isFavorite?: boolean, key?: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<AssetResponseDto>>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.getByTimeBucket(size, timeBucket, userId, albumId, isArchived, isFavorite, key, options);
-            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
-        },
-        /**
-         * 
-         * @param {TimeBucketSize} size 
-         * @param {string} [userId] 
-         * @param {string} [albumId] 
-         * @param {boolean} [isArchived] 
-         * @param {boolean} [isFavorite] 
-         * @param {string} [key] 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        async getTimeBuckets(size: TimeBucketSize, userId?: string, albumId?: string, isArchived?: boolean, isFavorite?: boolean, key?: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<TimeBucketResponseDto>>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.getTimeBuckets(size, userId, albumId, isArchived, isFavorite, key, options);
-            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
-        },
-    }
-};
-
-/**
- * TimeBucketApi - factory interface
- * @export
- */
-export const TimeBucketApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
-    const localVarFp = TimeBucketApiFp(configuration)
-    return {
-        /**
-         * 
-         * @param {TimeBucketSize} size 
-         * @param {string} timeBucket 
-         * @param {string} [userId] 
-         * @param {string} [albumId] 
-         * @param {boolean} [isArchived] 
-         * @param {boolean} [isFavorite] 
-         * @param {string} [key] 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        getByTimeBucket(size: TimeBucketSize, timeBucket: string, userId?: string, albumId?: string, isArchived?: boolean, isFavorite?: boolean, key?: string, options?: any): AxiosPromise<Array<AssetResponseDto>> {
-            return localVarFp.getByTimeBucket(size, timeBucket, userId, albumId, isArchived, isFavorite, key, options).then((request) => request(axios, basePath));
-        },
-        /**
-         * 
-         * @param {TimeBucketSize} size 
-         * @param {string} [userId] 
-         * @param {string} [albumId] 
-         * @param {boolean} [isArchived] 
-         * @param {boolean} [isFavorite] 
-         * @param {string} [key] 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        getTimeBuckets(size: TimeBucketSize, userId?: string, albumId?: string, isArchived?: boolean, isFavorite?: boolean, key?: string, options?: any): AxiosPromise<Array<TimeBucketResponseDto>> {
-            return localVarFp.getTimeBuckets(size, userId, albumId, isArchived, isFavorite, key, options).then((request) => request(axios, basePath));
-        },
-    };
-};
-
-/**
- * TimeBucketApi - object-oriented interface
- * @export
- * @class TimeBucketApi
- * @extends {BaseAPI}
- */
-export class TimeBucketApi extends BaseAPI {
-    /**
-     * 
-     * @param {TimeBucketSize} size 
-     * @param {string} timeBucket 
-     * @param {string} [userId] 
-     * @param {string} [albumId] 
-     * @param {boolean} [isArchived] 
-     * @param {boolean} [isFavorite] 
-     * @param {string} [key] 
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     * @memberof TimeBucketApi
-     */
-    public getByTimeBucket(size: TimeBucketSize, timeBucket: string, userId?: string, albumId?: string, isArchived?: boolean, isFavorite?: boolean, key?: string, options?: AxiosRequestConfig) {
-        return TimeBucketApiFp(this.configuration).getByTimeBucket(size, timeBucket, userId, albumId, isArchived, isFavorite, key, options).then((request) => request(this.axios, this.basePath));
-    }
-
-    /**
-     * 
-     * @param {TimeBucketSize} size 
-     * @param {string} [userId] 
-     * @param {string} [albumId] 
-     * @param {boolean} [isArchived] 
-     * @param {boolean} [isFavorite] 
-     * @param {string} [key] 
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     * @memberof TimeBucketApi
-     */
-    public getTimeBuckets(size: TimeBucketSize, userId?: string, albumId?: string, isArchived?: boolean, isFavorite?: boolean, key?: string, options?: AxiosRequestConfig) {
-        return TimeBucketApiFp(this.configuration).getTimeBuckets(size, userId, albumId, isArchived, isFavorite, key, options).then((request) => request(this.axios, this.basePath));
     }
 }
 

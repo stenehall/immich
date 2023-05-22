@@ -16,22 +16,24 @@ import { UseValidation } from '../decorators/use-validation.decorator';
 
 @ApiTags('Asset')
 @Controller('asset')
-@Authenticated()
 @UseValidation()
 export class AssetController {
   constructor(private service: AssetService) {}
 
+  @Authenticated()
   @Get('map-marker')
   getMapMarkers(@GetAuthUser() authUser: AuthUserDto, @Query() options: MapMarkerDto): Promise<MapMarkerResponseDto[]> {
     return this.service.getMapMarkers(authUser, options);
   }
 
-  @Get()
+  @Authenticated({ isShared: true })
+  @Get('time-buckets')
   getTimeBuckets(@GetAuthUser() authUser: AuthUserDto, @Query() dto: TimeBucketDto): Promise<TimeBucketResponseDto[]> {
     return this.service.getTimeBuckets(authUser, dto);
   }
 
-  @Get('assets')
+  @Authenticated({ isShared: true })
+  @Get('time-bucket')
   getByTimeBucket(@GetAuthUser() authUser: AuthUserDto, @Query() dto: TimeBucketAssetDto): Promise<AssetResponseDto[]> {
     return this.service.getByTimeBucket(authUser, dto);
   }

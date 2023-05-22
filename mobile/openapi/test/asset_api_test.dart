@@ -97,6 +97,11 @@ void main() {
       // TODO
     });
 
+    //Future<List<AssetResponseDto>> getByTimeBucket(TimeBucketSize size, String timeBucket, { String userId, String albumId, bool isArchived, bool isFavorite, String key }) async
+    test('test getByTimeBucket', () async {
+      // TODO
+    });
+
     //Future<List<CuratedLocationsResponseDto>> getCuratedLocations() async
     test('test getCuratedLocations', () async {
       // TODO
@@ -109,6 +114,11 @@ void main() {
 
     //Future<List<MapMarkerResponseDto>> getMapMarkers({ bool isFavorite }) async
     test('test getMapMarkers', () async {
+      // TODO
+    });
+
+    //Future<List<TimeBucketResponseDto>> getTimeBuckets(TimeBucketSize size, { String userId, String albumId, bool isArchived, bool isFavorite, String key }) async
+    test('test getTimeBuckets', () async {
       // TODO
     });
 

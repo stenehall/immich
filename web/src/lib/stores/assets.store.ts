@@ -66,7 +66,7 @@ function createAssetStore() {
 			if (currentBucketData?.assets && currentBucketData.assets.length > 0) {
 				return;
 			}
-			const { data: assets } = await api.timeBucketApi.getByTimeBucket(
+			const { data: assets } = await api.assetApi.getByTimeBucket(
 				_assetGridState.options.size,
 				bucket,
 				...api.getTimeBucketOptions(_assetGridState.options),

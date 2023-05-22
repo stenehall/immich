@@ -41,7 +41,6 @@ part 'api/server_info_api.dart';
 part 'api/share_api.dart';
 part 'api/system_config_api.dart';
 part 'api/tag_api.dart';
-part 'api/time_bucket_api.dart';
 part 'api/user_api.dart';
 
 part 'model/api_key_create_dto.dart';

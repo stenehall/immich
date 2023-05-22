@@ -39,7 +39,7 @@
 	export let timeBuckets: TimeBucketResponseDto[] = [];
 
 	onMount(async () => {
-		const { data } = await api.timeBucketApi.getTimeBuckets(
+		const { data } = await api.assetApi.getTimeBuckets(
 			options.size,
 			...api.getTimeBucketOptions(options)
 		);
