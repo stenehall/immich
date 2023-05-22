@@ -2034,10 +2034,16 @@ export interface SystemConfigDto {
 export interface SystemConfigFFmpegDto {
     /**
      * 
-     * @type {string}
+     * @type {number}
      * @memberof SystemConfigFFmpegDto
      */
-    'crf': string;
+    'crf': number;
+    /**
+     * 
+     * @type {number}
+     * @memberof SystemConfigFFmpegDto
+     */
+    'threads': number;
     /**
      * 
      * @type {string}
@@ -2062,6 +2068,18 @@ export interface SystemConfigFFmpegDto {
      * @memberof SystemConfigFFmpegDto
      */
     'targetResolution': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof SystemConfigFFmpegDto
+     */
+    'maxBitrate': string;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof SystemConfigFFmpegDto
+     */
+    'twoPass': boolean;
     /**
      * 
      * @type {string}
