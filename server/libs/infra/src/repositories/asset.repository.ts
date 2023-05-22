@@ -4,6 +4,8 @@ import {
   LivePhotoSearchOptions,
   MapMarker,
   MapMarkerSearchOptions,
+  Paginated,
+  PaginationOptions,
   TimeBucketItem,
   TimeBucketOptions,
   TimeBucketSize,
@@ -13,6 +15,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { FindOptionsRelations, FindOptionsWhere, In, IsNull, Not, Repository } from 'typeorm';
 import { AssetEntity, AssetType } from '../entities';
+import { paginate } from '../utils/pagination.util';
 
 const truncateMap: Record<TimeBucketSize, string> = {
   [TimeBucketSize.DAY]: 'day',
@@ -37,10 +40,8 @@ export class AssetRepository implements IAssetRepository {
     await this.repository.delete({ ownerId });
   }
 
-  getAll(options?: AssetSearchOptions | undefined): Promise<AssetEntity[]> {
-    options = options || {};
-
-    return this.repository.find({
+  getAll(pagination: PaginationOptions, options: AssetSearchOptions = {}): Paginated<AssetEntity> {
+    return paginate(this.repository, pagination, {
       where: {
         isVisible: options.isVisible,
         type: options.type,
@@ -49,6 +50,10 @@ export class AssetRepository implements IAssetRepository {
         exifInfo: true,
         smartInfo: true,
         tags: true,
+      },
+      order: {
+        // Ensures correct order when paginating
+        createdAt: 'ASC',
       },
     });
   }
@@ -84,7 +89,7 @@ export class AssetRepository implements IAssetRepository {
     });
   }
 
-  getWithout(property: WithoutProperty): Promise<AssetEntity[]> {
+  getWithout(pagination: PaginationOptions, property: WithoutProperty): Paginated<AssetEntity> {
     let relations: FindOptionsRelations<AssetEntity> = {};
     let where: FindOptionsWhere<AssetEntity> | FindOptionsWhere<AssetEntity>[] = {};
 
@@ -161,9 +166,13 @@ export class AssetRepository implements IAssetRepository {
         throw new Error(`Invalid getWithout property: ${property}`);
     }
 
-    return this.repository.find({
+    return paginate(this.repository, pagination, {
       relations,
       where,
+      order: {
+        // Ensures correct order when paginating
+        createdAt: 'ASC',
+      },
     });
   }
 
