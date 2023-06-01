@@ -38,6 +38,11 @@ const yesterday = new Date();
 tomorrow.setDate(today.getDate() + 1);
 yesterday.setDate(yesterday.getDate() - 1);
 
+const sharedLinkBytes = Buffer.from(
+  '2c2b646895f84753bff43fb696ad124f3b0faf2a0bd547406f26fa4a76b5c71990092baa536275654b2ab7a191fb21a6d6cd',
+  'hex',
+);
+
 export const authStub = {
   admin: Object.freeze<AuthUserDto>({
     id: 'admin_id',
@@ -672,7 +677,7 @@ export const sharedLinkStub = {
     id: '123',
     userId: authStub.admin.id,
     user: userEntityStub.admin,
-    key: Buffer.from('secret-key', 'utf8'),
+    key: sharedLinkBytes,
     type: SharedLinkType.ALBUM,
     createdAt: today,
     expiresAt: tomorrow,
@@ -686,7 +691,7 @@ export const sharedLinkStub = {
     id: '123',
     userId: authStub.admin.id,
     user: userEntityStub.admin,
-    key: Buffer.from('secret-key', 'utf8'),
+    key: sharedLinkBytes,
     type: SharedLinkType.ALBUM,
     createdAt: today,
     expiresAt: yesterday,
@@ -699,7 +704,7 @@ export const sharedLinkStub = {
     id: '123',
     userId: authStub.admin.id,
     user: userEntityStub.admin,
-    key: Buffer.from('secret-key', 'utf8'),
+    key: sharedLinkBytes,
     type: SharedLinkType.ALBUM,
     createdAt: today,
     expiresAt: tomorrow,
@@ -796,7 +801,7 @@ export const sharedLinkResponseStub = {
     description: undefined,
     expiresAt: tomorrow,
     id: '123',
-    key: '7365637265742d6b6579',
+    key: sharedLinkBytes.toString('base64url'),
     showExif: true,
     type: SharedLinkType.ALBUM,
     userId: 'admin_id',
@@ -810,7 +815,7 @@ export const sharedLinkResponseStub = {
     description: undefined,
     expiresAt: yesterday,
     id: '123',
-    key: '7365637265742d6b6579',
+    key: sharedLinkBytes.toString('base64url'),
     showExif: true,
     type: SharedLinkType.ALBUM,
     userId: 'admin_id',
@@ -818,7 +823,7 @@ export const sharedLinkResponseStub = {
   readonly: Object.freeze<SharedLinkResponseDto>({
     id: '123',
     userId: 'admin_id',
-    key: '7365637265742d6b6579',
+    key: sharedLinkBytes.toString('base64url'),
     type: SharedLinkType.ALBUM,
     createdAt: today,
     expiresAt: tomorrow,
@@ -832,7 +837,7 @@ export const sharedLinkResponseStub = {
   readonlyNoExif: Object.freeze<SharedLinkResponseDto>({
     id: '123',
     userId: 'admin_id',
-    key: '7365637265742d6b6579',
+    key: sharedLinkBytes.toString('base64url'),
     type: SharedLinkType.ALBUM,
     createdAt: today,
     expiresAt: tomorrow,
