@@ -10,15 +10,11 @@
 		isMultiSelectStoreState,
 		selectedAssets
 	} from '$lib/stores/asset-interaction.store';
-	import { onDestroy } from 'svelte';
+	import { TimeBucketSize } from '@api';
 	import ArrowLeft from 'svelte-material-icons/ArrowLeft.svelte';
 	import type { PageData } from './$types';
 
 	export let data: PageData;
-
-	onDestroy(() => {
-		assetInteractionStore.clearMultiselect();
-	});
 </script>
 
 <main class="grid h-screen pt-18 bg-immich-bg dark:bg-immich-dark-bg">
@@ -43,5 +39,11 @@
 			</svelte:fragment>
 		</ControlAppBar>
 	{/if}
-	<AssetGrid user={data.partner} />
+	<AssetGrid
+		options={{
+			size: TimeBucketSize.Month,
+			isArchived: false,
+			userId: data.partner.id
+		}}
+	/>
 </main>

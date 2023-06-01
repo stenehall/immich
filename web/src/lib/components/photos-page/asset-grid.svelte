@@ -1,39 +1,52 @@
 <script lang="ts">
 	import { onDestroy, onMount } from 'svelte';
 
-	import { UserResponseDto } from '@api';
-	import IntersectionObserver from '../asset-viewer/intersection-observer.svelte';
-	import { assetGridState, assetStore, loadingBucketState } from '$lib/stores/assets.store';
-	import { api, AssetCountByTimeBucketResponseDto, AssetResponseDto, TimeGroupEnum } from '@api';
-	import AssetDateGroup from './asset-date-group.svelte';
-	import Portal from '../shared-components/portal/portal.svelte';
-	import AssetViewer from '../asset-viewer/asset-viewer.svelte';
 	import {
 		assetInteractionStore,
 		isViewingAssetStoreState,
 		viewingAssetStoreState
 	} from '$lib/stores/asset-interaction.store';
+	import {
+		assetGridEmpty,
+		assetGridState,
+		assetStore,
+		loadingBucketState
+	} from '$lib/stores/assets.store';
+	import { AssetResponseDto, TimeBucketResponseDto, TimeBucketSize, api } from '@api';
+	import { AssetGridOptions } from '../../models/asset-grid-state';
+	import AssetViewer from '../asset-viewer/asset-viewer.svelte';
+	import IntersectionObserver from '../asset-viewer/intersection-observer.svelte';
+	import Portal from '../shared-components/portal/portal.svelte';
 	import Scrollbar, {
 		OnScrollbarClickDetail,
 		OnScrollbarDragDetail
 	} from '../shared-components/scrollbar/scrollbar.svelte';
+	import AssetDateGroup from './asset-date-group.svelte';
 
-	export let user: UserResponseDto | undefined = undefined;
 	export let isAlbumSelectionMode = false;
+	export let options: AssetGridOptions = {
+		size: TimeBucketSize.Month
+	};
+
+	export let empty = false;
+	$: empty = $assetGridEmpty;
+
+	const MIN_OVERFLOW_THRESHOLD = 100;
 
 	let viewportHeight = 0;
 	let viewportWidth = 0;
 	let assetGridElement: HTMLElement;
-	let bucketInfo: AssetCountByTimeBucketResponseDto;
+	export let timeBuckets: TimeBucketResponseDto[] = [];
 
 	onMount(async () => {
-		const { data: assetCountByTimebucket } = await api.assetApi.getAssetCountByTimeBucket({
-			timeGroup: TimeGroupEnum.Month,
-			userId: user?.id
-		});
-		bucketInfo = assetCountByTimebucket;
+		const { data } = await api.timeBucketApi.getTimeBuckets(
+			options.size,
+			...api.getTimeBucketOptions(options)
+		);
 
-		assetStore.setInitialState(viewportHeight, viewportWidth, assetCountByTimebucket, user?.id);
+		timeBuckets = data;
+
+		assetStore.setInitialState(viewportHeight, viewportWidth, timeBuckets, options);
 
 		// Get asset bucket if bucket height is smaller than viewport height
 		let bucketsToFetchInitially: string[] = [];
@@ -54,7 +67,9 @@
 	});
 
 	onDestroy(() => {
-		assetStore.setInitialState(0, 0, { totalCount: 0, buckets: [] }, undefined);
+		assetStore.reset();
+		assetInteractionStore.clearMultiselect();
+		assetInteractionStore.setIsViewingAsset(false);
 	});
 
 	function intersectedHandler(event: CustomEvent) {
@@ -104,7 +119,7 @@
 	};
 </script>
 
-{#if bucketInfo && viewportHeight && $assetGridState.timelineHeight > viewportHeight}
+{#if timeBuckets.length > 0 && viewportHeight && viewportHeight + MIN_OVERFLOW_THRESHOLD < $assetGridState.timelineHeight}
 	<Scrollbar
 		scrollbarHeight={viewportHeight}
 		scrollTop={lastScrollPosition}
@@ -115,7 +130,7 @@
 
 <section
 	id="asset-grid"
-	class="overflow-y-auto pl-4 scrollbar-hidden"
+	class="overflow-y-auto pl-4 scrollbar-hidden h-full pb-8"
 	bind:clientHeight={viewportHeight}
 	bind:clientWidth={viewportWidth}
 	bind:this={assetGridElement}
@@ -144,6 +159,7 @@
 								assets={bucket.assets}
 								bucketDate={bucket.bucketDate}
 								bucketHeight={bucket.bucketHeight}
+								sharedKey={options.sharedKey}
 							/>
 						{/if}
 					</div>

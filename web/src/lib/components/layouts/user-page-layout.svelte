@@ -7,6 +7,9 @@
 	export let hideNavbar = false;
 	export let showUploadButton = false;
 	export let title: string | undefined = undefined;
+	export let scrollbar = true;
+
+	$: scrollbarClass = scrollbar ? 'immich-scrollbar p-4 pb-8' : 'scrollbar-hidden pl-4';
 </script>
 
 <header>
@@ -36,7 +39,7 @@
 				</div>
 
 				<div
-					class="absolute overflow-y-auto top-16 h-[calc(100%-theme(spacing.16))] w-full immich-scrollbar p-4 pb-8"
+					class="absolute overflow-y-auto top-16 h-[calc(100%-theme(spacing.16))] w-full {scrollbarClass}"
 				>
 					<slot />
 				</div>

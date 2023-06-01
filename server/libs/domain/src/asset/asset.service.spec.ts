@@ -1,12 +1,20 @@
 import { AssetEntity, AssetType } from '@app/infra/entities';
-import { assetEntityStub, authStub, newAssetRepositoryMock, newJobRepositoryMock } from '../../test';
+import {
+  assetEntityStub,
+  authStub,
+  newAssetRepositoryMock,
+  newJobRepositoryMock,
+  newPartnerRepositoryMock,
+} from '../../test';
 import { AssetService, IAssetRepository } from '../asset';
 import { IJobRepository, JobName } from '../job';
+import { IPartnerRepository } from '../partner';
 
 describe(AssetService.name, () => {
   let sut: AssetService;
   let assetMock: jest.Mocked<IAssetRepository>;
   let jobMock: jest.Mocked<IJobRepository>;
+  let partnerMock: jest.Mocked<IPartnerRepository>;
 
   it('should work', () => {
     expect(sut).toBeDefined();
@@ -15,12 +23,13 @@ describe(AssetService.name, () => {
   beforeEach(async () => {
     assetMock = newAssetRepositoryMock();
     jobMock = newJobRepositoryMock();
-    sut = new AssetService(assetMock, jobMock);
+    partnerMock = newPartnerRepositoryMock();
+    sut = new AssetService(assetMock, jobMock, partnerMock);
   });
 
   describe(`handle asset upload`, () => {
     it('should process an uploaded video', async () => {
-      const data = { asset: { type: AssetType.VIDEO } as AssetEntity };
+      const data = { asset: { type: AssetType.VIDEO } as AssetEntity, fileName: 'video.mp4' };
 
       await expect(sut.handleAssetUpload(data)).resolves.toBeUndefined();
 
@@ -33,7 +42,7 @@ describe(AssetService.name, () => {
     });
 
     it('should process an uploaded image', async () => {
-      const data = { asset: { type: AssetType.IMAGE } as AssetEntity };
+      const data = { asset: { type: AssetType.IMAGE } as AssetEntity, fileName: 'image.jpg' };
 
       await sut.handleAssetUpload(data);
 

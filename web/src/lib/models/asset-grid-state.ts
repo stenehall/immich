@@ -1,4 +1,4 @@
-import { AssetResponseDto } from '@api';
+import { AssetResponseDto, TimeBucketSize } from '@api';
 
 export class AssetBucket {
 	/**
@@ -11,7 +11,18 @@ export class AssetBucket {
 	cancelToken!: AbortController;
 }
 
+export interface AssetGridOptions {
+	size: TimeBucketSize;
+	albumId?: string;
+	userId?: string;
+	isArchived?: boolean;
+	isFavorite?: boolean;
+	sharedKey?: string;
+}
+
 export class AssetGridState {
+	initialized = false;
+
 	/**
 	 * The total height of the timeline in pixel
 	 * This value is first estimated by the number of asset and later is corrected as the user scroll
@@ -38,8 +49,5 @@ export class AssetGridState {
 	 */
 	assets: AssetResponseDto[] = [];
 
-	/**
-	 * User that owns assets
-	 */
-	userId: string | undefined;
+	options: AssetGridOptions = { size: TimeBucketSize.Month };
 }

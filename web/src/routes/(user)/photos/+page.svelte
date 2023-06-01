@@ -15,15 +15,11 @@
 		selectedAssets
 	} from '$lib/stores/asset-interaction.store';
 	import { assetStore } from '$lib/stores/assets.store';
-	import { onDestroy } from 'svelte';
+	import { TimeBucketSize } from '@api';
 	import Plus from 'svelte-material-icons/Plus.svelte';
 	import type { PageData } from './$types';
 
 	export let data: PageData;
-
-	onDestroy(() => {
-		assetInteractionStore.clearMultiselect();
-	});
 </script>
 
 <UserPageLayout user={data.user} hideNavbar={$isMultiSelectStoreState} showUploadButton>
@@ -46,5 +42,5 @@
 		{/if}
 	</svelte:fragment>
 
-	<AssetGrid slot="content" />
+	<AssetGrid slot="content" options={{ isArchived: false, size: TimeBucketSize.Month }} />
 </UserPageLayout>

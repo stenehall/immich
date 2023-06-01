@@ -1,25 +1,31 @@
-import { AssetGridState } from '$lib/models/asset-grid-state';
+import { AssetGridOptions, AssetGridState } from '$lib/models/asset-grid-state';
 import { calculateViewportHeightByNumberOfAsset } from '$lib/utils/viewport-utils';
-import { api, AssetCountByTimeBucketResponseDto } from '@api';
-import { sumBy, flatMap } from 'lodash-es';
-import { writable } from 'svelte/store';
+import { api, TimeBucketResponseDto } from '@api';
+import { flatMap, sumBy } from 'lodash-es';
+import { derived, writable } from 'svelte/store';
 
 /**
  * The state that holds information about the asset grid
  */
 export const assetGridState = writable<AssetGridState>(new AssetGridState());
 export const loadingBucketState = writable<{ [key: string]: boolean }>({});
+export const assetGridEmpty = derived(
+	assetGridState,
+	(state) => state.initialized && state.buckets.length === 0
+);
 
 function createAssetStore() {
 	let _assetGridState = new AssetGridState();
-	assetGridState.subscribe((state) => {
-		_assetGridState = state;
-	});
+	assetGridState.subscribe((state) => (_assetGridState = state));
 
-	let _loadingBucketState: { [key: string]: boolean } = {};
-	loadingBucketState.subscribe((state) => {
-		_loadingBucketState = state;
-	});
+	const reset = () => {
+		for (const bucket of _assetGridState.buckets) {
+			bucket.cancelToken.abort();
+		}
+
+		assetGridState.set(new AssetGridState());
+	};
+
 	/**
 	 * Set initial state
 	 * @param viewportHeight
@@ -29,21 +35,22 @@ function createAssetStore() {
 	const setInitialState = (
 		viewportHeight: number,
 		viewportWidth: number,
-		data: AssetCountByTimeBucketResponseDto,
-		userId: string | undefined
+		timeBuckets: TimeBucketResponseDto[],
+		options: AssetGridOptions
 	) => {
 		assetGridState.set({
+			initialized: true,
 			viewportHeight,
 			viewportWidth,
 			timelineHeight: 0,
-			buckets: data.buckets.map((d) => ({
-				bucketDate: d.timeBucket,
-				bucketHeight: calculateViewportHeightByNumberOfAsset(d.count, viewportWidth),
+			buckets: timeBuckets.map(({ timeBucket, count }) => ({
+				bucketDate: timeBucket,
+				bucketHeight: calculateViewportHeightByNumberOfAsset(count, viewportWidth),
 				assets: [],
 				cancelToken: new AbortController()
 			})),
 			assets: [],
-			userId
+			options
 		});
 
 		// Update timeline height based on calculated bucket height
@@ -59,22 +66,12 @@ function createAssetStore() {
 			if (currentBucketData?.assets && currentBucketData.assets.length > 0) {
 				return;
 			}
-
-			loadingBucketState.set({
-				..._loadingBucketState,
-				[bucket]: true
-			});
-			const { data: assets } = await api.assetApi.getAssetByTimeBucket(
-				{
-					timeBucket: [bucket],
-					userId: _assetGridState.userId
-				},
+			const { data: assets } = await api.timeBucketApi.getByTimeBucket(
+				_assetGridState.options.size,
+				bucket,
+				...api.getTimeBucketOptions(_assetGridState.options),
 				{ signal: currentBucketData?.cancelToken.signal }
 			);
-			loadingBucketState.set({
-				..._loadingBucketState,
-				[bucket]: false
-			});
 
 			// Update assetGridState with assets by time bucket
 			assetGridState.update((state) => {
@@ -156,6 +153,7 @@ function createAssetStore() {
 	};
 
 	return {
+		reset,
 		setInitialState,
 		getAssetsByBucket,
 		removeAsset,

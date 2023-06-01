@@ -1,3 +1,4 @@
+import { AssetGridOptions } from '../lib/models/asset-grid-state';
 import {
 	AlbumApi,
 	APIKeyApi,
@@ -15,7 +16,8 @@ import {
 	ShareApi,
 	SystemConfigApi,
 	UserApi,
-	UserApiFp
+	UserApiFp,
+	TimeBucketApi
 } from './open-api';
 import { BASE_PATH } from './open-api/base';
 import { DUMMY_BASE_URL, toPathString } from './open-api/common';
@@ -34,6 +36,7 @@ export class ImmichApi {
 	public shareApi: ShareApi;
 	public personApi: PersonApi;
 	public systemConfigApi: SystemConfigApi;
+	public timeBucketApi: TimeBucketApi;
 	public userApi: UserApi;
 
 	private config: Configuration;
@@ -53,6 +56,7 @@ export class ImmichApi {
 		this.shareApi = new ShareApi(this.config);
 		this.personApi = new PersonApi(this.config);
 		this.systemConfigApi = new SystemConfigApi(this.config);
+		this.timeBucketApi = new TimeBucketApi(this.config);
 		this.userApi = new UserApi(this.config);
 	}
 
@@ -105,6 +109,16 @@ export class ImmichApi {
 	public getPeopleThumbnailUrl(personId: string) {
 		const path = `/person/${personId}/thumbnail`;
 		return this.createUrl(path);
+	}
+
+	public getTimeBucketOptions(options: AssetGridOptions) {
+		return [
+			options.userId,
+			options.albumId,
+			options.isArchived,
+			options.isFavorite,
+			options.sharedKey
+		] as const;
 	}
 }
 

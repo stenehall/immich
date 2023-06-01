@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { browser } from '$app/environment';
 	import { afterNavigate, goto } from '$app/navigation';
-	import { albumAssetSelectionStore } from '$lib/stores/album-asset-selection.store';
+	import { assetStore } from '$lib/stores/assets.store';
 	import { downloadAssets } from '$lib/stores/download';
 	import { locale } from '$lib/stores/preferences.store';
 	import { clickOutside } from '$lib/utils/click-outside';
@@ -11,6 +11,7 @@
 		AssetResponseDto,
 		SharedLinkResponseDto,
 		SharedLinkType,
+		TimeBucketSize,
 		UserResponseDto,
 		api
 	} from '@api';
@@ -22,17 +23,22 @@
 	import FolderDownloadOutline from 'svelte-material-icons/FolderDownloadOutline.svelte';
 	import Plus from 'svelte-material-icons/Plus.svelte';
 	import ShareVariantOutline from 'svelte-material-icons/ShareVariantOutline.svelte';
+	import {
+		assetInteractionStore,
+		isMultiSelectStoreState,
+		selectedAssets
+	} from '../../stores/asset-interaction.store';
 	import Button from '../elements/buttons/button.svelte';
 	import CircleIconButton from '../elements/buttons/circle-icon-button.svelte';
 	import DownloadFiles from '../photos-page/actions/download-files.svelte';
 	import RemoveFromAlbum from '../photos-page/actions/remove-from-album.svelte';
+	import AssetGrid from '../photos-page/asset-grid.svelte';
 	import AssetSelectControlBar from '../photos-page/asset-select-control-bar.svelte';
 	import CircleAvatar from '../shared-components/circle-avatar.svelte';
 	import ContextMenu from '../shared-components/context-menu/context-menu.svelte';
 	import MenuOption from '../shared-components/context-menu/menu-option.svelte';
 	import ControlAppBar from '../shared-components/control-app-bar.svelte';
 	import CreateSharedLinkModal from '../shared-components/create-share-link-modal/create-shared-link-modal.svelte';
-	import GalleryViewer from '../shared-components/gallery-viewer/gallery-viewer.svelte';
 	import ImmichLogo from '../shared-components/immich-logo.svelte';
 	import {
 		NotificationType,
@@ -46,14 +52,12 @@
 
 	export let album: AlbumResponseDto;
 	export let sharedLink: SharedLinkResponseDto | undefined = undefined;
-
-	const { isAlbumAssetSelectionOpen } = albumAssetSelectionStore;
+	export let startDate: Date = new Date();
+	export let endDate: Date = new Date();
 
 	let isShowAssetSelection = false;
-
 	let isShowShareLinkModal = false;
 
-	$: $isAlbumAssetSelectionOpen = isShowAssetSelection;
 	$: {
 		if (browser) {
 			if (isShowAssetSelection) {
@@ -75,12 +79,10 @@
 	let currentUser: UserResponseDto;
 	let titleInput: HTMLInputElement;
 	let contextMenuPosition = { x: 0, y: 0 };
+	let empty = false;
 
 	$: isPublicShared = sharedLink;
 	$: isOwned = currentUser?.id == album.ownerId;
-
-	let multiSelectAsset: Set<AssetResponseDto> = new Set();
-	$: isMultiSelectionMode = multiSelectAsset.size > 0;
 
 	afterNavigate(({ from }) => {
 		backUrl = from?.url.pathname ?? '/albums';
@@ -97,9 +99,6 @@
 	};
 
 	const getDateRange = () => {
-		const startDate = new Date(album.assets[0].fileCreatedAt);
-		const endDate = new Date(album.assets[album.assetCount - 1].fileCreatedAt);
-
 		const startDateString = startDate.toLocaleDateString($locale, albumDateFormat);
 		const endDateString = endDate.toLocaleDateString($locale, albumDateFormat);
 
@@ -332,21 +331,17 @@
 </script>
 
 <section class="bg-immich-bg dark:bg-immich-dark-bg" class:hidden={isShowThumbnailSelection}>
-	<!-- Multiselection mode app bar -->
-	{#if isMultiSelectionMode}
+	{#if $isMultiSelectStoreState}
 		<AssetSelectControlBar
-			assets={multiSelectAsset}
-			clearSelect={() => (multiSelectAsset = new Set())}
+			assets={$selectedAssets}
+			clearSelect={assetInteractionStore.clearMultiselect}
 		>
 			<DownloadFiles filename={album.albumName} sharedLinkKey={sharedLink?.key} />
 			{#if isOwned}
-				<RemoveFromAlbum bind:album />
+				<RemoveFromAlbum albumId={album.id} onAssetDelete={assetStore.removeAsset} />
 			{/if}
 		</AssetSelectControlBar>
-	{/if}
-
-	<!-- Default app bar -->
-	{#if !isMultiSelectionMode}
+	{:else}
 		<ControlAppBar
 			on:close-button-click={() => goto(backUrl)}
 			backIcon={ArrowLeft}
@@ -493,13 +488,28 @@
 			</div>
 		{/if}
 
-		{#if album.assetCount > 0}
-			<GalleryViewer
-				assets={album.assets}
-				{sharedLink}
-				bind:selectedAssets={multiSelectAsset}
-				viewFrom="album-page"
-			/>
+		{#if !isShowAssetSelection}
+			<!--
+				TODO: Find better solution for problem below
+	
+				Workaround to prevent AssetGrid from being rendered simultaneously
+				in multiple places. AssetSelection also renders AssetGrid and that
+				causes issues with the global state in stores. This component also
+				has a transition duration of 100ms on which we have to wait to make
+				sure it unmounts first.
+			-->
+			{#await new Promise((resolve) => setTimeout(resolve, 100)) then}
+				{#if album.assetCount > 0}
+					<AssetGrid
+						bind:empty
+						options={{
+							size: TimeBucketSize.Month,
+							albumId: album.id,
+							sharedKey: sharedLink?.key
+						}}
+					/>
+				{/if}
+			{/await}
 		{:else}
 			<!-- Album is empty - Show asset selectection buttons -->
 			<section id="empty-album" class=" mt-[200px] flex place-content-center place-items-center">

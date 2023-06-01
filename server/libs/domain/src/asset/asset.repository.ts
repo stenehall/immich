@@ -6,6 +6,18 @@ export interface AssetSearchOptions {
   type?: AssetType;
 }
 
+export enum TimeBucketSize {
+  DAY = 'DAY',
+  MONTH = 'MONTH',
+}
+
+export interface TimeBucketOptions {
+  size: TimeBucketSize;
+  isArchived?: boolean;
+  isFavorite?: boolean;
+  albumId?: string;
+}
+
 export interface LivePhotoSearchOptions {
   ownerId: string;
   livePhotoCID: string;
@@ -34,6 +46,11 @@ export enum WithoutProperty {
 
 export const IAssetRepository = 'IAssetRepository';
 
+export interface TimeBucketItem {
+  timeBucket: string;
+  count: number;
+}
+
 export interface IAssetRepository {
   getByIds(ids: string[]): Promise<AssetEntity[]>;
   getWithout(pagination: PaginationOptions, property: WithoutProperty): Paginated<AssetEntity>;
@@ -43,4 +60,6 @@ export interface IAssetRepository {
   save(asset: Partial<AssetEntity>): Promise<AssetEntity>;
   findLivePhotoMatch(options: LivePhotoSearchOptions): Promise<AssetEntity | null>;
   getMapMarkers(ownerId: string, options?: MapMarkerSearchOptions): Promise<MapMarker[]>;
+  getTimeBuckets(userId: string, options: TimeBucketOptions): Promise<TimeBucketItem[]>;
+  getByTimeBucket(userId: string, timeBucket: string, options: TimeBucketOptions): Promise<AssetEntity[]>;
 }
