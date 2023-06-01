@@ -66,6 +66,16 @@ export const authStub = {
     isShowExif: true,
     sharedLinkId: '123',
   }),
+  adminSharedLinkNoExif: Object.freeze<AuthUserDto>({
+    id: 'admin_id',
+    email: 'admin@test.com',
+    isAdmin: true,
+    isAllowUpload: true,
+    isAllowDownload: true,
+    isPublicUser: true,
+    isShowExif: false,
+    sharedLinkId: '123',
+  }),
   readonlySharedLink: Object.freeze<AuthUserDto>({
     id: 'admin_id',
     email: 'admin@test.com',
@@ -685,7 +695,7 @@ export const sharedLinkStub = {
     showExif: true,
     assets: [],
   } as SharedLinkEntity),
-  readonly: Object.freeze<SharedLinkEntity>({
+  readonlyNoExif: Object.freeze<SharedLinkEntity>({
     id: '123',
     userId: authStub.admin.id,
     user: userEntityStub.admin,
@@ -695,7 +705,7 @@ export const sharedLinkStub = {
     expiresAt: tomorrow,
     allowUpload: false,
     allowDownload: false,
-    showExif: true,
+    showExif: false,
     assets: [],
     album: {
       id: 'album-123',
@@ -829,7 +839,7 @@ export const sharedLinkResponseStub = {
     description: undefined,
     allowUpload: false,
     allowDownload: false,
-    showExif: true,
+    showExif: false,
     album: albumResponse,
     assets: [{ ...assetResponse, exifInfo: undefined }],
   }),
