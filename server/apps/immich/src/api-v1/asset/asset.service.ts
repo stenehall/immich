@@ -25,12 +25,12 @@ import { CuratedObjectsResponseDto } from './response-dto/curated-objects-respon
 import {
   AssetResponseDto,
   getLivePhotoMotionFilename,
+  IAccessRepository,
   ImmichReadStream,
   IStorageRepository,
   JobName,
   mapAsset,
   mapAssetWithoutExif,
-  PartnerCore,
 } from '@app/domain';
 import { CreateAssetDto, UploadFile } from './dto/create-asset.dto';
 import { DeleteAssetResponseDto, DeleteAssetStatusEnum } from './response-dto/delete-asset-response.dto';
@@ -53,9 +53,7 @@ import { AssetFileUploadResponseDto } from './response-dto/asset-file-upload-res
 import { ICryptoRepository, IJobRepository } from '@app/domain';
 import { DownloadService } from '../../modules/download/download.service';
 import { DownloadDto } from './dto/download-library.dto';
-import { IAlbumRepository } from '../album/album-repository';
 import { SharedLinkCore } from '@app/domain';
-import { IPartnerRepository } from '@app/domain';
 import { ISharedLinkRepository } from '@app/domain';
 import { DownloadFilesDto } from './dto/download-files.dto';
 import { CreateAssetsShareLinkDto } from './dto/create-asset-shared-link.dto';
@@ -82,23 +80,19 @@ export class AssetService {
   readonly logger = new Logger(AssetService.name);
   private shareCore: SharedLinkCore;
   private assetCore: AssetCore;
-  private partnerCore: PartnerCore;
 
   constructor(
+    @Inject(IAccessRepository) private accessRepository: IAccessRepository,
     @Inject(IAssetRepository) private _assetRepository: IAssetRepository,
-    @Inject(IAlbumRepository) private _albumRepository: IAlbumRepository,
-    @InjectRepository(AssetEntity)
-    private assetRepository: Repository<AssetEntity>,
+    @InjectRepository(AssetEntity) private assetRepository: Repository<AssetEntity>,
     private downloadService: DownloadService,
     @Inject(ISharedLinkRepository) sharedLinkRepository: ISharedLinkRepository,
     @Inject(IJobRepository) private jobRepository: IJobRepository,
     @Inject(ICryptoRepository) cryptoRepository: ICryptoRepository,
     @Inject(IStorageRepository) private storageRepository: IStorageRepository,
-    @Inject(IPartnerRepository) private partnerRepository: IPartnerRepository,
   ) {
     this.assetCore = new AssetCore(_assetRepository, jobRepository);
     this.shareCore = new SharedLinkCore(sharedLinkRepository, cryptoRepository);
-    this.partnerCore = new PartnerCore(partnerRepository);
   }
 
   public async uploadFile(
@@ -150,11 +144,14 @@ export class AssetService {
   }
 
   public async getAllAssets(authUser: AuthUserDto, dto: AssetSearchDto): Promise<AssetResponseDto[]> {
-    if (dto.userId && dto.userId !== authUser.id) {
-      await this.checkUserAccess(authUser, dto.userId);
-    }
-    const assets = await this._assetRepository.getAllByUserId(dto.userId || authUser.id, dto);
+    const userId = dto.userId || authUser.id;
 
+    const hasAccess = await this.accessRepository.hasPartnerAccess(authUser.id, userId);
+    if (!hasAccess) {
+      throw new ForbiddenException();
+    }
+
+    const assets = await this._assetRepository.getAllByUserId(userId, dto);
     return assets.map((asset) => mapAsset(asset));
   }
 
@@ -163,7 +160,6 @@ export class AssetService {
     getAssetByTimeBucketDto: GetAssetByTimeBucketDto,
   ): Promise<AssetResponseDto[]> {
     if (getAssetByTimeBucketDto.userId) {
-      await this.checkUserAccess(authUser, getAssetByTimeBucketDto.userId);
     }
 
     const assets = await this._assetRepository.getAssetByTimeBucket(
@@ -204,7 +200,7 @@ export class AssetService {
     return this.downloadService.downloadArchive(dto.name || `library`, assets);
   }
 
-  public async downloadFiles(dto: DownloadFilesDto) {
+  public async downloadFiles(authUser: AuthUserDto, dto: DownloadFilesDto) {
     const assetToDownload = [];
 
     for (const assetId of dto.assetIds) {
@@ -223,9 +219,6 @@ export class AssetService {
   }
 
   public async downloadFile(authUser: AuthUserDto, assetId: string): Promise<ImmichReadStream> {
-    this.checkDownloadAccess(authUser);
-    await this.checkAssetsAccess(authUser, [assetId]);
-
     try {
       const asset = await this._assetRepository.get(assetId);
       if (asset && asset.originalPath && asset.mimeType) {
@@ -239,7 +232,13 @@ export class AssetService {
     throw new NotFoundException();
   }
 
-  async getAssetThumbnail(assetId: string, query: GetAssetThumbnailDto, res: Res, headers: Record<string, string>) {
+  async getAssetThumbnail(
+    authUser: AuthUserDto,
+    assetId: string,
+    query: GetAssetThumbnailDto,
+    res: Res,
+    headers: Record<string, string>,
+  ) {
     const asset = await this._assetRepository.get(assetId);
     if (!asset) {
       throw new NotFoundException('Asset not found');
@@ -528,7 +527,6 @@ export class AssetService {
     getAssetCountByTimeBucketDto: GetAssetCountByTimeBucketDto,
   ): Promise<AssetCountByTimeBucketResponseDto> {
     if (getAssetCountByTimeBucketDto.userId !== undefined) {
-      await this.checkUserAccess(authUser, getAssetCountByTimeBucketDto.userId);
     }
 
     const result = await this._assetRepository.getAssetCountByTimeBucket(
@@ -547,54 +545,9 @@ export class AssetService {
     return this._assetRepository.getArchivedAssetCountByUserId(authUser.id);
   }
 
-  async checkAssetsAccess(authUser: AuthUserDto, assetIds: string[], mustBeOwner = false) {
-    for (const assetId of assetIds) {
-      // Step 1: Check if asset is part of a public shared
-      if (authUser.sharedLinkId) {
-        const canAccess = await this.shareCore.hasAssetAccess(authUser.sharedLinkId, assetId);
-        if (canAccess) {
-          continue;
-        }
-      } else {
-        // Step 2: Check if user owns asset
-        if ((await this._assetRepository.countByIdAndUser(assetId, authUser.id)) == 1) {
-          continue;
-        }
-
-        // Step 3: Check if any partner owns the asset
-        const canAccess = await this.partnerCore.hasAssetAccess(assetId, authUser.id);
-        if (canAccess) {
-          continue;
-        }
-
-        // Avoid additional checks if ownership is required
-        if (!mustBeOwner) {
-          // Step 2: Check if asset is part of an album shared with me
-          if ((await this._albumRepository.getSharedWithUserAlbumCount(authUser.id, assetId)) > 0) {
-            continue;
-          }
-        }
-      }
-
-      throw new ForbiddenException();
-    }
-  }
-
-  private async checkUserAccess(authUser: AuthUserDto, userId: string) {
-    // Check if userId shares assets with authUser
-    if (!(await this.partnerCore.get({ sharedById: userId, sharedWithId: authUser.id }))) {
-      throw new ForbiddenException();
-    }
-  }
-
-  checkDownloadAccess(authUser: AuthUserDto) {
-    this.shareCore.checkDownloadAccess(authUser);
-  }
-
   async createAssetsSharedLink(authUser: AuthUserDto, dto: CreateAssetsShareLinkDto): Promise<SharedLinkResponseDto> {
     const assets = [];
 
-    await this.checkAssetsAccess(authUser, dto.assetIds);
     for (const assetId of dto.assetIds) {
       const asset = await this._assetRepository.getById(assetId);
       assets.push(asset);

@@ -1,5 +1,5 @@
 import { AssetEntity, SharedLinkEntity } from '@app/infra/entities';
-import { BadRequestException, ForbiddenException, Logger, UnauthorizedException } from '@nestjs/common';
+import { BadRequestException, Logger, UnauthorizedException } from '@nestjs/common';
 import { AuthUserDto } from '../auth';
 import { ICryptoRepository } from '../crypto';
 import { CreateSharedLinkDto } from './dto';
@@ -45,16 +45,6 @@ export class SharedLinkCore {
     const newAssets = link.assets.filter((asset) => assets.find((a) => a.id === asset.id));
 
     return this.repository.update({ ...link, assets: newAssets });
-  }
-
-  async hasAssetAccess(id: string, assetId: string): Promise<boolean> {
-    return this.repository.hasAssetAccess(id, assetId);
-  }
-
-  checkDownloadAccess(user: AuthUserDto) {
-    if (user.isPublicUser && !user.isAllowDownload) {
-      throw new ForbiddenException();
-    }
   }
 
   async validate(key: string | string[]): Promise<AuthUserDto | null> {

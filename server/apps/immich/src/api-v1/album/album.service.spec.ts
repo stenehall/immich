@@ -127,7 +127,6 @@ describe('Album service', () => {
       removeUser: jest.fn(),
       updateThumbnails: jest.fn(),
       getCountByUserId: jest.fn(),
-      getSharedWithUserAlbumCount: jest.fn(),
     };
 
     sharedLinkRepositoryMock = newSharedLinkRepositoryMock();

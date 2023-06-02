@@ -43,7 +43,6 @@ export interface IAssetRepository {
   getAssetByTimeBucket(userId: string, getAssetByTimeBucketDto: GetAssetByTimeBucketDto): Promise<AssetEntity[]>;
   getAssetsByChecksums(userId: string, checksums: Buffer[]): Promise<AssetCheck[]>;
   getExistingAssets(userId: string, checkDuplicateAssetDto: CheckExistingAssetsDto): Promise<string[]>;
-  countByIdAndUser(assetId: string, userId: string): Promise<number>;
 }
 
 export const IAssetRepository = 'IAssetRepository';
@@ -352,15 +351,6 @@ export class AssetRepository implements IAssetRepository {
       },
     });
     return assets.map((asset) => asset.deviceAssetId);
-  }
-
-  async countByIdAndUser(assetId: string, ownerId: string): Promise<number> {
-    return await this.assetRepository.count({
-      where: {
-        id: assetId,
-        ownerId,
-      },
-    });
   }
 
   private getAssetCount(items: any): AssetCountByUserIdResponseDto {

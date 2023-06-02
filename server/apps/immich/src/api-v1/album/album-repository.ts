@@ -17,7 +17,6 @@ export interface IAlbumRepository {
   addAssets(album: AlbumEntity, addAssetsDto: AddAssetsDto): Promise<AddAssetsResponseDto>;
   updateThumbnails(): Promise<number | undefined>;
   getCountByUserId(userId: string): Promise<AlbumCountResponseDto>;
-  getSharedWithUserAlbumCount(userId: string, assetId: string): Promise<number>;
 }
 
 export const IAlbumRepository = 'IAlbumRepository';
@@ -161,26 +160,5 @@ export class AlbumRepository implements IAlbumRepository {
     const result = await updateAlbums.execute();
 
     return result.affected;
-  }
-
-  async getSharedWithUserAlbumCount(userId: string, assetId: string): Promise<number> {
-    return this.albumRepository.count({
-      where: [
-        {
-          ownerId: userId,
-          assets: {
-            id: assetId,
-          },
-        },
-        {
-          sharedUsers: {
-            id: userId,
-          },
-          assets: {
-            id: assetId,
-          },
-        },
-      ],
-    });
   }
 }

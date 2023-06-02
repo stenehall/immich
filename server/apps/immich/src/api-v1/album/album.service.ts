@@ -137,8 +137,4 @@ export class AlbumService {
 
     return mapSharedLink(sharedLink);
   }
-
-  checkDownloadAccess(authUser: AuthUserDto) {
-    this.shareCore.checkDownloadAccess(authUser);
-  }
 }

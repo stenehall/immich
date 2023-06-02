@@ -26,8 +26,4 @@ export class PartnerCore {
   async remove(ids: PartnerIds): Promise<void> {
     await this.repository.remove(ids as PartnerEntity);
   }
-
-  hasAssetAccess(assetId: string, userId: string): Promise<boolean> {
-    return this.repository.hasAssetAccess(assetId, userId);
-  }
 }

@@ -7,15 +7,7 @@ import { AssetCountByTimeBucket } from './response-dto/asset-count-by-time-group
 import { TimeGroupEnum } from './dto/get-asset-count-by-time-bucket.dto';
 import { AssetCountByUserIdResponseDto } from './response-dto/asset-count-by-user-id-response.dto';
 import { DownloadService } from '../../modules/download/download.service';
-import { AlbumRepository, IAlbumRepository } from '../album/album-repository';
-import {
-  ICryptoRepository,
-  IJobRepository,
-  IPartnerRepository,
-  ISharedLinkRepository,
-  IStorageRepository,
-  JobName,
-} from '@app/domain';
+import { ICryptoRepository, IJobRepository, ISharedLinkRepository, IStorageRepository, JobName } from '@app/domain';
 import {
   assetEntityStub,
   authStub,
@@ -28,7 +20,7 @@ import {
   sharedLinkStub,
 } from '@app/domain/../test';
 import { CreateAssetsShareLinkDto } from './dto/create-asset-shared-link.dto';
-import { BadRequestException, ForbiddenException } from '@nestjs/common';
+import { BadRequestException } from '@nestjs/common';
 import { when } from 'jest-when';
 import { AssetRejectReason, AssetUploadAction } from './response-dto/asset-check-response.dto';
 
@@ -132,9 +124,7 @@ describe('AssetService', () => {
   let sut: AssetService;
   let a: Repository<AssetEntity>; // TO BE DELETED AFTER FINISHED REFACTORING
   let assetRepositoryMock: jest.Mocked<IAssetRepository>;
-  let albumRepositoryMock: jest.Mocked<IAlbumRepository>;
   let downloadServiceMock: jest.Mocked<Partial<DownloadService>>;
-  let partnerRepositoryMock: jest.Mocked<IPartnerRepository>;
   let sharedLinkRepositoryMock: jest.Mocked<ISharedLinkRepository>;
   let cryptoMock: jest.Mocked<ICryptoRepository>;
   let jobMock: jest.Mocked<IJobRepository>;
@@ -162,12 +152,7 @@ describe('AssetService', () => {
       getAssetCountByUserId: jest.fn(),
       getArchivedAssetCountByUserId: jest.fn(),
       getExistingAssets: jest.fn(),
-      countByIdAndUser: jest.fn(),
     };
-
-    albumRepositoryMock = {
-      getSharedWithUserAlbumCount: jest.fn(),
-    } as unknown as jest.Mocked<AlbumRepository>;
 
     downloadServiceMock = {
       downloadArchive: jest.fn(),
@@ -180,14 +165,12 @@ describe('AssetService', () => {
 
     sut = new AssetService(
       assetRepositoryMock,
-      albumRepositoryMock,
       a,
       downloadServiceMock as DownloadService,
       sharedLinkRepositoryMock,
       jobMock,
       cryptoMock,
       storageMock,
-      partnerRepositoryMock,
     );
 
     when(assetRepositoryMock.get)
@@ -204,13 +187,11 @@ describe('AssetService', () => {
       const dto: CreateAssetsShareLinkDto = { assetIds: [asset1.id] };
 
       assetRepositoryMock.getById.mockResolvedValue(asset1);
-      assetRepositoryMock.countByIdAndUser.mockResolvedValue(1);
       sharedLinkRepositoryMock.create.mockResolvedValue(sharedLinkStub.valid);
 
       await expect(sut.createAssetsSharedLink(authStub.user1, dto)).resolves.toEqual(sharedLinkResponseStub.valid);
 
       expect(assetRepositoryMock.getById).toHaveBeenCalledWith(asset1.id);
-      expect(assetRepositoryMock.countByIdAndUser).toHaveBeenCalledWith(asset1.id, authStub.user1.id);
     });
   });
 
@@ -485,19 +466,8 @@ describe('AssetService', () => {
     });
   });
 
-  describe('checkDownloadAccess', () => {
-    it('should validate download access', async () => {
-      await sut.checkDownloadAccess(authStub.adminSharedLink);
-    });
-
-    it('should not allow when user is not allowed to download', async () => {
-      expect(() => sut.checkDownloadAccess(authStub.readonlySharedLink)).toThrow(ForbiddenException);
-    });
-  });
-
   describe('downloadFile', () => {
     it('should download a single file', async () => {
-      assetRepositoryMock.countByIdAndUser.mockResolvedValue(1);
       assetRepositoryMock.get.mockResolvedValue(_getAsset_1());
 
       await sut.downloadFile(authStub.admin, 'id_1');
