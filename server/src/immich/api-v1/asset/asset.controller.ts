@@ -150,7 +150,7 @@ export class AssetController {
     @Param() { id }: UUIDParamDto,
     @Query(new ValidationPipe({ transform: true })) query: GetAssetThumbnailDto,
   ) {
-    this.assetService.getAssetThumbnail(authUser, id, query, res);
+    this.assetService.serveAssetThumbnail(authUser, id, query, res);
   }
 
   @Get('/curated-objects')

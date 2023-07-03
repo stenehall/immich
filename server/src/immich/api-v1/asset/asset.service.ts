@@ -239,7 +239,7 @@ export class AssetService {
     return mapAsset(updatedAsset);
   }
 
-  async getAssetThumbnail(authUser: AuthUserDto, assetId: string, query: GetAssetThumbnailDto, res: Res) {
+  async serveAssetThumbnail(authUser: AuthUserDto, assetId: string, query: GetAssetThumbnailDto, res: Res) {
     await this.access.requirePermission(authUser, Permission.ASSET_VIEW, assetId);
 
     const asset = await this._assetRepository.get(assetId);
@@ -274,9 +274,12 @@ export class AssetService {
     let contentType;
     if (asset.type === AssetType.IMAGE) {
       ({ filepath, contentType } = this.getServePath(asset, query, allowOriginalFile));
+    } else if (asset.encodedVideoPath) {
+      filepath = asset.encodedVideoPath;
+      contentType = 'video/mp4';
     } else {
-      filepath = asset.encodedVideoPath ? asset.encodedVideoPath : asset.originalPath;
-      contentType = asset.encodedVideoPath ? 'video/mp4' : asset.mimeType;
+      filepath = asset.originalPath;
+      contentType = asset.mimeType;
     }
 
     this.streamFile(res, filepath, contentType);
