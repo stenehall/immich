@@ -545,5 +545,10 @@ describe('AssetService', () => {
       const range = sut.getRange('', 1024);
       expect(range).toStrictEqual({});
     });
+
+    it('should throw an error if multipart range', async () => {
+      const rangeRequestHeader = 'bytes=128-255, 512-767';
+      expect(() => sut.getRange(rangeRequestHeader, 1024)).toThrowError(BadRequestException);
+    });
   });
 });

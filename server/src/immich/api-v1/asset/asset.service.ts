@@ -611,9 +611,12 @@ export class AssetService {
       return {};
     }
     /** Extracting Start and End value from Range Header */
-    const [startStr, endStr] = rangeRequestHeader.replace(/bytes=/, '').split('-');
-    let start = parseInt(startStr, 10);
-    let end = endStr ? parseInt(endStr, 10) : size - 1;
+    const splitHeader = rangeRequestHeader.replace(/bytes=/, '').split('-');
+    if (splitHeader.length > 2) {
+      throw new BadRequestException('Multipart range requests are not supported');
+    }
+    let start = parseInt(splitHeader[0], 10);
+    let end = splitHeader[1] ? parseInt(splitHeader[1]) : size - 1;
 
     if (isNaN(start)) {
       start = 0;
