@@ -575,8 +575,6 @@ export class AssetService {
       res.header('Content-Type', contentType);
     }
 
-    const range = this.setResRange(res, headers, Number(size));
-
     // etag
     const etag = `W/"${size}-${mtimeNs}"`;
     res.setHeader('ETag', etag);
@@ -585,21 +583,35 @@ export class AssetService {
       return;
     }
 
-    const stream = createReadStream(filepath, range);
-    return await pipeline(stream, res).catch((err) => {
+    const { start, end } = this.getRange(headers.range, Number(size));
+    if (start != null && end != null) {
+      if (start >= size || end >= size) {
+        res.status(416).set({ 'Content-Range': `bytes */${size}` });
+        throw new BadRequestException('Bad Request Range');
+      }
+
+      res.status(206).set({
+        'Content-Range': `bytes ${start}-${end}/${size}`,
+        'Accept-Ranges': 'bytes',
+        'Content-Length': end - start + 1,
+      });
+    }
+
+    const stream = createReadStream(filepath, { start, end });
+
+    return pipeline(stream, res).catch((err) => {
       if (err.code !== 'ERR_STREAM_PREMATURE_CLOSE') {
         this.logger.error(err);
       }
     });
   }
 
-  private setResRange(res: Res, headers: Record<string, string>, size: number) {
-    if (!headers.range) {
+  private getRange(rangeRequestHeader: string, size: number) {
+    if (!rangeRequestHeader) {
       return {};
     }
-
     /** Extracting Start and End value from Range Header */
-    const [startStr, endStr] = headers.range.replace(/bytes=/, '').split('-');
+    const [startStr, endStr] = rangeRequestHeader.replace(/bytes=/, '').split('-');
     let start = parseInt(startStr, 10);
     let end = endStr ? parseInt(endStr, 10) : size - 1;
 
@@ -612,20 +624,6 @@ export class AssetService {
       start = size - end;
       end = size - 1;
     }
-
-    // Handle unavailable range request
-    if (start >= size || end >= size) {
-      console.error('Bad Request');
-      res.status(416).set({ 'Content-Range': `bytes */${size}` });
-
-      throw new BadRequestException('Bad Request Range');
-    }
-
-    res.status(206).set({
-      'Content-Range': `bytes ${start}-${end}/${size}`,
-      'Accept-Ranges': 'bytes',
-      'Content-Length': end - start + 1,
-    });
 
     return { start, end };
   }
