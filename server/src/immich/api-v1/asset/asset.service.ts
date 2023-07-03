@@ -543,8 +543,9 @@ export class AssetService {
     if (contentType) {
       res.contentType(contentType);
     }
-    res.sendFile(filepath, { root: '/usr/src/app' }, (err) => {
-      if (err && err.message !== 'Premature close') {
+    const options = filepath.startsWith('/') ? {} : { root: '/usr/src/app' };
+    res.sendFile(filepath, options, (err) => {
+      if (err && err.message !== 'Request aborted') {
         this.logger.error(err);
       }
     });
