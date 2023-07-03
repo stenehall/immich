@@ -129,12 +129,11 @@ export class AssetController {
   })
   serveFile(
     @AuthUser() authUser: AuthUserDto,
-    @Headers() headers: Record<string, string>,
-    @Response({ passthrough: true }) res: Res,
+    @Response() res: Res,
     @Query(new ValidationPipe({ transform: true })) query: ServeFileDto,
     @Param() { id }: UUIDParamDto,
   ) {
-    return this.assetService.serveFile(authUser, id, query, res, headers);
+    this.assetService.serveFile(authUser, id, query, res);
   }
 
   @SharedLinkRoute()
@@ -148,12 +147,11 @@ export class AssetController {
   })
   getAssetThumbnail(
     @AuthUser() authUser: AuthUserDto,
-    @Headers() headers: Record<string, string>,
-    @Response({ passthrough: true }) res: Res,
+    @Response() res: Res,
     @Param() { id }: UUIDParamDto,
     @Query(new ValidationPipe({ transform: true })) query: GetAssetThumbnailDto,
   ) {
-    return this.assetService.getAssetThumbnail(authUser, id, query, res, headers);
+    this.assetService.getAssetThumbnail(authUser, id, query, res);
   }
 
   @Get('/curated-objects')

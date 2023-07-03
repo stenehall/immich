@@ -24,11 +24,9 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Response as Res } from 'express';
-import { constants, createReadStream } from 'fs';
-import fs from 'fs/promises';
+import { constants } from 'fs';
 import mime from 'mime-types';
 import path from 'path';
-import { pipeline } from 'stream/promises';
 import { QueryFailedError, Repository } from 'typeorm';
 import { IAssetRepository } from './asset-repository';
 import { AssetCore } from './asset.core';
@@ -241,13 +239,7 @@ export class AssetService {
     return mapAsset(updatedAsset);
   }
 
-  async getAssetThumbnail(
-    authUser: AuthUserDto,
-    assetId: string,
-    query: GetAssetThumbnailDto,
-    res: Res,
-    headers: Record<string, string>,
-  ) {
+  async getAssetThumbnail(authUser: AuthUserDto, assetId: string, query: GetAssetThumbnailDto, res: Res) {
     await this.access.requirePermission(authUser, Permission.ASSET_VIEW, assetId);
 
     const asset = await this._assetRepository.get(assetId);
@@ -257,7 +249,7 @@ export class AssetService {
 
     try {
       const [thumbnailPath, contentType] = this.getThumbnailPath(asset, query.format);
-      return this.streamFile(thumbnailPath, res, headers, contentType);
+      return this.streamFile(res, thumbnailPath, contentType);
     } catch (e) {
       res.header('Cache-Control', 'none');
       this.logger.error(`Cannot create read stream for asset ${asset.id}`, 'getAssetThumbnail');
@@ -268,16 +260,9 @@ export class AssetService {
     }
   }
 
-  public async serveFile(
-    authUser: AuthUserDto,
-    assetId: string,
-    query: ServeFileDto,
-    res: Res,
-    headers: Record<string, string>,
-  ) {
+  public async serveFile(authUser: AuthUserDto, assetId: string, query: ServeFileDto, res: Res) {
     // this is not quite right as sometimes this returns the original still
     await this.access.requirePermission(authUser, Permission.ASSET_VIEW, assetId);
-
     const allowOriginalFile = !!(!authUser.isPublicUser || authUser.isAllowDownload);
 
     const asset = await this._assetRepository.getById(assetId);
@@ -285,29 +270,16 @@ export class AssetService {
       throw new NotFoundException('Asset does not exist');
     }
 
-    // Handle Sending Images
-    if (asset.type == AssetType.IMAGE) {
-      try {
-        const { filepath, contentType } = this.getServePath(asset, query, allowOriginalFile);
-        return this.streamFile(filepath, res, headers, contentType);
-      } catch (e) {
-        this.logger.error(`Cannot create read stream for asset ${asset.id} ${JSON.stringify(e)}`, 'serveFile[IMAGE]');
-        throw new InternalServerErrorException(
-          e,
-          `Cannot read thumbnail file for asset ${asset.id} - contact your administrator`,
-        );
-      }
+    let filepath;
+    let contentType;
+    if (asset.type === AssetType.IMAGE) {
+      ({ filepath, contentType } = this.getServePath(asset, query, allowOriginalFile));
     } else {
-      try {
-        const videoPath = asset.encodedVideoPath ? asset.encodedVideoPath : asset.originalPath;
-        const mimeType = asset.encodedVideoPath ? 'video/mp4' : asset.mimeType;
-
-        return this.streamFile(videoPath, res, headers, mimeType);
-      } catch (e: Error | any) {
-        this.logger.error(`Error serving VIDEO asset=${asset.id}`, e?.stack);
-        throw new InternalServerErrorException(`Failed to serve video asset ${e}`, 'ServeFile');
-      }
+      filepath = asset.encodedVideoPath ? asset.encodedVideoPath : asset.originalPath;
+      contentType = asset.encodedVideoPath ? 'video/mp4' : asset.mimeType;
     }
+
+    this.streamFile(res, filepath, contentType);
   }
 
   public async deleteAll(authUser: AuthUserDto, dto: DeleteAssetDto): Promise<DeleteAssetResponseDto[]> {
@@ -567,65 +539,14 @@ export class AssetService {
     return { filepath: asset.resizePath, contentType: 'image/jpeg' };
   }
 
-  private async streamFile(filepath: string, res: Res, headers: Record<string, string>, contentType?: string | null) {
-    await fs.access(filepath, constants.R_OK);
-    const { size, mtimeNs } = await fs.stat(filepath, { bigint: true });
-
+  async streamFile(res: Res, filepath: string, contentType?: string | null) {
     if (contentType) {
-      res.header('Content-Type', contentType);
+      res.contentType(contentType);
     }
-
-    // etag
-    const etag = `W/"${size}-${mtimeNs}"`;
-    res.setHeader('ETag', etag);
-    if (etag === headers['if-none-match']) {
-      res.status(304);
-      return;
-    }
-
-    const { start, end } = this.getRange(headers.range, Number(size));
-    if (start != null && end != null) {
-      if (start >= size || end >= size) {
-        res.status(416).set({ 'Content-Range': `bytes */${size}` });
-        throw new BadRequestException('Bad Request Range');
-      }
-
-      res.status(206).set({
-        'Content-Range': `bytes ${start}-${end}/${size}`,
-        'Accept-Ranges': 'bytes',
-        'Content-Length': end - start + 1,
-      });
-    }
-
-    const stream = createReadStream(filepath, { start, end });
-
-    return pipeline(stream, res).catch((err) => {
-      if (err.code !== 'ERR_STREAM_PREMATURE_CLOSE') {
+    res.sendFile(filepath, { root: '/usr/src/app' }, (err) => {
+      if (err && err.message !== 'Premature close') {
         this.logger.error(err);
       }
     });
-  }
-
-  public getRange(rangeRequestHeader: string, totalSize: number) {
-    if (!rangeRequestHeader) {
-      return {};
-    }
-    /** Extracting Start and End value from Range Header */
-    const splitHeader = rangeRequestHeader.replace(/bytes=/, '').split('-');
-    if (splitHeader.length > 2) {
-      throw new BadRequestException('Multipart range requests are not supported');
-    }
-    let start = parseInt(splitHeader[0], 10);
-    let end = splitHeader[1] ? parseInt(splitHeader[1]) : totalSize - 1;
-
-    if (isNaN(start)) {
-      start = 0;
-    }
-
-    if (isNaN(end)) {
-      end = totalSize - 1;
-    }
-
-    return { start, end };
   }
 }
