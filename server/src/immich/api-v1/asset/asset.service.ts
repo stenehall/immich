@@ -606,7 +606,7 @@ export class AssetService {
     });
   }
 
-  private getRange(rangeRequestHeader: string, size: number) {
+  public getRange(rangeRequestHeader: string, size: number) {
     if (!rangeRequestHeader) {
       return {};
     }
@@ -615,13 +615,11 @@ export class AssetService {
     let start = parseInt(startStr, 10);
     let end = endStr ? parseInt(endStr, 10) : size - 1;
 
-    if (!isNaN(start) && isNaN(end)) {
-      start = start;
-      end = size - 1;
+    if (isNaN(start)) {
+      start = 0;
     }
 
-    if (isNaN(start) && !isNaN(end)) {
-      start = size - end;
+    if (isNaN(end)) {
       end = size - 1;
     }
 
