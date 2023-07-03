@@ -546,7 +546,7 @@ export class AssetService {
     if (contentType) {
       res.contentType(contentType);
     }
-    const options = filepath.startsWith('/') ? {} : { root: '/usr/src/app' };
+    const options = filepath.startsWith('/') ? {} : { root: process.cwd() }; // handle relative paths
     res.sendFile(filepath, options, (err) => {
       if (err && err.message !== 'Request aborted') {
         this.logger.error(err);
