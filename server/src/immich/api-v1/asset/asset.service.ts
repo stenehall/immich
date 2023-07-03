@@ -606,7 +606,7 @@ export class AssetService {
     });
   }
 
-  public getRange(rangeRequestHeader: string, size: number) {
+  public getRange(rangeRequestHeader: string, totalSize: number) {
     if (!rangeRequestHeader) {
       return {};
     }
@@ -616,14 +616,14 @@ export class AssetService {
       throw new BadRequestException('Multipart range requests are not supported');
     }
     let start = parseInt(splitHeader[0], 10);
-    let end = splitHeader[1] ? parseInt(splitHeader[1]) : size - 1;
+    let end = splitHeader[1] ? parseInt(splitHeader[1]) : totalSize - 1;
 
     if (isNaN(start)) {
       start = 0;
     }
 
     if (isNaN(end)) {
-      end = size - 1;
+      end = totalSize - 1;
     }
 
     return { start, end };
