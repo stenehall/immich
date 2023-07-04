@@ -543,9 +543,11 @@ export class AssetService {
   }
 
   async streamFile(res: Res, filepath: string, contentType?: string | null) {
+    res.set('Cache-Control', 'private, max-age=86400, no-transform');
     if (contentType) {
       res.contentType(contentType);
     }
+
     const options = filepath.startsWith('/') ? {} : { root: process.cwd() }; // handle relative paths
     res.sendFile(filepath, options, (err) => {
       if (err && err.message !== 'Request aborted') {

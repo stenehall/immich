@@ -121,7 +121,6 @@ export class AssetController {
 
   @SharedLinkRoute()
   @Get('/file/:id')
-  @Header('Cache-Control', 'private, max-age=86400, no-transform')
   @ApiOkResponse({
     content: {
       'application/octet-stream': { schema: { type: 'string', format: 'binary' } },
@@ -141,7 +140,6 @@ export class AssetController {
 
   @SharedLinkRoute()
   @Get('/thumbnail/:id')
-  @Header('Cache-Control', 'private, max-age=86400, no-transform')
   @ApiOkResponse({
     content: {
       'image/jpeg': { schema: { type: 'string', format: 'binary' } },
