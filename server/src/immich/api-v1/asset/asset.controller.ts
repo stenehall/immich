@@ -132,13 +132,13 @@ export class AssetController {
     @Param() { id }: UUIDParamDto,
   ) {
     this.assetService.serveFile(authUser, id, query, res).catch((err: Error) => {
-      let code = 500;
+      let status = 500;
       let body = err.message;
       if (err instanceof HttpException) {
-        code = err.getStatus();
+        status = err.getStatus();
         body = JSON.stringify(err.getResponse());
       }
-      return res.status(code).end(body);
+      return res.status(status).end(body);
     });
   }
 
