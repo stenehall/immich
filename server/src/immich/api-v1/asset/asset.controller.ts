@@ -4,7 +4,6 @@ import {
   Controller,
   Delete,
   Get,
-  Header,
   HttpCode,
   HttpException,
   HttpStatus,
