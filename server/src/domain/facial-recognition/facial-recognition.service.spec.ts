@@ -5,19 +5,19 @@ import {
   newFaceRepositoryMock,
   newJobRepositoryMock,
   newMachineLearningRepositoryMock,
-  newMediaRepositoryMock,
   newPersonRepositoryMock,
   newSearchRepositoryMock,
   newStorageRepositoryMock,
+  newThumbnailRepositoryMock,
   personStub,
 } from '@test';
 import { IAssetRepository, WithoutProperty } from '../asset';
 import { IJobRepository, JobName } from '../job';
-import { IMediaRepository } from '../media';
 import { IPersonRepository } from '../person';
 import { ISearchRepository } from '../search';
 import { IMachineLearningRepository } from '../smart-info';
 import { IStorageRepository } from '../storage';
+import { IThumbnailRepository } from '../thumbnail';
 import { IFaceRepository } from './face.repository';
 import { FacialRecognitionService } from './facial-recognition.services';
 
@@ -97,7 +97,7 @@ describe(FacialRecognitionService.name, () => {
   let faceMock: jest.Mocked<IFaceRepository>;
   let jobMock: jest.Mocked<IJobRepository>;
   let machineLearningMock: jest.Mocked<IMachineLearningRepository>;
-  let mediaMock: jest.Mocked<IMediaRepository>;
+  let thumbnailMock: jest.Mocked<IThumbnailRepository>;
   let personMock: jest.Mocked<IPersonRepository>;
   let searchMock: jest.Mocked<ISearchRepository>;
   let storageMock: jest.Mocked<IStorageRepository>;
@@ -107,19 +107,19 @@ describe(FacialRecognitionService.name, () => {
     faceMock = newFaceRepositoryMock();
     jobMock = newJobRepositoryMock();
     machineLearningMock = newMachineLearningRepositoryMock();
-    mediaMock = newMediaRepositoryMock();
+    thumbnailMock = newThumbnailRepositoryMock();
     personMock = newPersonRepositoryMock();
     searchMock = newSearchRepositoryMock();
     storageMock = newStorageRepositoryMock();
 
-    mediaMock.crop.mockResolvedValue(croppedFace);
+    thumbnailMock.crop.mockResolvedValue(croppedFace);
 
     sut = new FacialRecognitionService(
       assetMock,
       faceMock,
       jobMock,
       machineLearningMock,
-      mediaMock,
+      thumbnailMock,
       personMock,
       searchMock,
       storageMock,
@@ -250,7 +250,7 @@ describe(FacialRecognitionService.name, () => {
 
       await sut.handleGenerateFaceThumbnail(face.middle);
 
-      expect(mediaMock.crop).not.toHaveBeenCalled();
+      expect(thumbnailMock.crop).not.toHaveBeenCalled();
     });
 
     it('should skip an asset without a thumbnail', async () => {
@@ -258,7 +258,7 @@ describe(FacialRecognitionService.name, () => {
 
       await sut.handleGenerateFaceThumbnail(face.middle);
 
-      expect(mediaMock.crop).not.toHaveBeenCalled();
+      expect(thumbnailMock.crop).not.toHaveBeenCalled();
     });
 
     it('should generate a thumbnail', async () => {
@@ -268,13 +268,13 @@ describe(FacialRecognitionService.name, () => {
 
       expect(assetMock.getByIds).toHaveBeenCalledWith(['asset-1']);
       expect(storageMock.mkdirSync).toHaveBeenCalledWith('upload/thumbs/user-id');
-      expect(mediaMock.crop).toHaveBeenCalledWith('/uploads/user-id/thumbs/path.ext', {
+      expect(thumbnailMock.crop).toHaveBeenCalledWith('/uploads/user-id/thumbs/path.ext', {
         left: 95,
         top: 95,
         width: 110,
         height: 110,
       });
-      expect(mediaMock.resize).toHaveBeenCalledWith(croppedFace, 'upload/thumbs/user-id/person-1.jpeg', {
+      expect(thumbnailMock.resize).toHaveBeenCalledWith(croppedFace, 'upload/thumbs/user-id/person-1.jpeg', {
         format: 'jpeg',
         size: 250,
       });
@@ -289,13 +289,13 @@ describe(FacialRecognitionService.name, () => {
 
       await sut.handleGenerateFaceThumbnail(face.start);
 
-      expect(mediaMock.crop).toHaveBeenCalledWith('/uploads/user-id/thumbs/path.ext', {
+      expect(thumbnailMock.crop).toHaveBeenCalledWith('/uploads/user-id/thumbs/path.ext', {
         left: 0,
         top: 0,
         width: 510,
         height: 510,
       });
-      expect(mediaMock.resize).toHaveBeenCalledWith(croppedFace, 'upload/thumbs/user-id/person-1.jpeg', {
+      expect(thumbnailMock.resize).toHaveBeenCalledWith(croppedFace, 'upload/thumbs/user-id/person-1.jpeg', {
         format: 'jpeg',
         size: 250,
       });
@@ -306,13 +306,13 @@ describe(FacialRecognitionService.name, () => {
 
       await sut.handleGenerateFaceThumbnail(face.end);
 
-      expect(mediaMock.crop).toHaveBeenCalledWith('/uploads/user-id/thumbs/path.ext', {
+      expect(thumbnailMock.crop).toHaveBeenCalledWith('/uploads/user-id/thumbs/path.ext', {
         left: 297,
         top: 297,
         width: 202,
         height: 202,
       });
-      expect(mediaMock.resize).toHaveBeenCalledWith(croppedFace, 'upload/thumbs/user-id/person-1.jpeg', {
+      expect(thumbnailMock.resize).toHaveBeenCalledWith(croppedFace, 'upload/thumbs/user-id/person-1.jpeg', {
         format: 'jpeg',
         size: 250,
       });

@@ -5,7 +5,6 @@ import { AssetService } from './asset';
 import { AuthService } from './auth';
 import { FacialRecognitionService } from './facial-recognition';
 import { JobService } from './job';
-import { MediaService } from './media';
 import { MetadataService } from './metadata';
 import { OAuthService } from './oauth';
 import { PartnerService } from './partner';
@@ -18,6 +17,8 @@ import { StorageService } from './storage';
 import { StorageTemplateService } from './storage-template';
 import { INITIAL_SYSTEM_CONFIG, SystemConfigService } from './system-config';
 import { TagService } from './tag';
+import { ThumbnailService } from './thumbnail';
+import { TranscodeService } from './transcode';
 import { UserService } from './user';
 
 const providers: Provider[] = [
@@ -27,7 +28,7 @@ const providers: Provider[] = [
   AuthService,
   FacialRecognitionService,
   JobService,
-  MediaService,
+  ThumbnailService,
   MetadataService,
   OAuthService,
   PersonService,
@@ -40,6 +41,7 @@ const providers: Provider[] = [
   StorageTemplateService,
   SystemConfigService,
   TagService,
+  TranscodeService,
   UserService,
   {
     provide: INITIAL_SYSTEM_CONFIG,

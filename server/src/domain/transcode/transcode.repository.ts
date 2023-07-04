@@ -1,9 +1,6 @@
-export const IMediaRepository = 'IMediaRepository';
+import { SystemConfigFFmpegDto } from '../system-config';
 
-export interface ResizeOptions {
-  size: number;
-  format: 'webp' | 'jpeg';
-}
+export const ITranscodeRepository = 'ITranscodeRepository';
 
 export interface VideoStreamInfo {
   height: number;
@@ -31,26 +28,26 @@ export interface VideoInfo {
   audioStreams: AudioStreamInfo[];
 }
 
-export interface CropOptions {
-  top: number;
-  left: number;
-  width: number;
-  height: number;
-}
-
 export interface TranscodeOptions {
   outputOptions: string[];
   twoPass: boolean;
 }
 
-export interface IMediaRepository {
-  // image
-  resize(input: string | Buffer, output: string, options: ResizeOptions): Promise<void>;
-  crop(input: string, options: CropOptions): Promise<Buffer>;
-  generateThumbhash(imagePath: string): Promise<Buffer>;
+export interface BitrateDistribution {
+  max: number;
+  target: number;
+  min: number;
+  unit: string;
+}
 
-  // video
-  extractVideoThumbnail(input: string, output: string, size: number): Promise<void>;
+export interface CodecHandler {
+  getScalingOptions(stream: VideoStreamInfo): Array<string>;
+  getPresetOptions(): Array<string>;
+  getBitrateOptions(): Array<string>;
+  getThreadOptions(): Array<string>;
+}
+
+export interface ITranscodeRepository {
   probe(input: string): Promise<VideoInfo>;
   transcode(input: string, output: string, options: TranscodeOptions): Promise<void>;
 }
