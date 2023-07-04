@@ -239,7 +239,7 @@ export class AssetService {
     return mapAsset(updatedAsset);
   }
 
-  async serveAssetThumbnail(authUser: AuthUserDto, assetId: string, query: GetAssetThumbnailDto, res: Res) {
+  async getAssetThumbnail(authUser: AuthUserDto, assetId: string, query: GetAssetThumbnailDto, res: Res) {
     await this.access.requirePermission(authUser, Permission.ASSET_VIEW, assetId);
 
     const asset = await this._assetRepository.get(assetId);
