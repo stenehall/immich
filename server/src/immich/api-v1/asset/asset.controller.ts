@@ -6,6 +6,7 @@ import {
   Get,
   Header,
   HttpCode,
+  HttpException,
   HttpStatus,
   Param,
   ParseFilePipe,
@@ -132,7 +133,10 @@ export class AssetController {
     @Query(new ValidationPipe({ transform: true })) query: ServeFileDto,
     @Param() { id }: UUIDParamDto,
   ) {
-    this.assetService.serveFile(authUser, id, query, res);
+    this.assetService.serveFile(authUser, id, query, res).catch((err: Error) => {
+      const code = err instanceof HttpException ? err.getStatus() : 500;
+      return res.status(code).end(err.message);
+    });
   }
 
   @SharedLinkRoute()
@@ -150,7 +154,10 @@ export class AssetController {
     @Param() { id }: UUIDParamDto,
     @Query(new ValidationPipe({ transform: true })) query: GetAssetThumbnailDto,
   ) {
-    this.assetService.serveAssetThumbnail(authUser, id, query, res);
+    this.assetService.serveAssetThumbnail(authUser, id, query, res).catch((err: Error) => {
+      const code = err instanceof HttpException ? err.getStatus() : 500;
+      return res.status(code).end(err.message);
+    });
   }
 
   @Get('/curated-objects')
