@@ -133,8 +133,13 @@ export class AssetController {
     @Param() { id }: UUIDParamDto,
   ) {
     this.assetService.serveFile(authUser, id, query, res).catch((err: Error) => {
-      const code = err instanceof HttpException ? err.getStatus() : 500;
-      return res.status(code).end(err.message);
+      let code = 500;
+      let body = err.message;
+      if (err instanceof HttpException) {
+        code = err.getStatus();
+        body = JSON.stringify(err.getResponse());
+      }
+      return res.status(code).end(body);
     });
   }
 
@@ -153,8 +158,13 @@ export class AssetController {
     @Query(new ValidationPipe({ transform: true })) query: GetAssetThumbnailDto,
   ) {
     this.assetService.serveAssetThumbnail(authUser, id, query, res).catch((err: Error) => {
-      const code = err instanceof HttpException ? err.getStatus() : 500;
-      return res.status(code).end(err.message);
+      let code = 500;
+      let body = err.message;
+      if (err instanceof HttpException) {
+        code = err.getStatus();
+        body = JSON.stringify(err.getResponse());
+      }
+      return res.status(code).end(body);
     });
   }
 
