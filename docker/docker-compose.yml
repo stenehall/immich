@@ -28,6 +28,16 @@ services:
       - database
       - typesense
     restart: always
+    # # uncomment if using nvenc for transcoding 
+    # environment:
+    #  - NVIDIA_DRIVER_CAPABILITIES=all
+    # deploy:
+    #   resources:
+    #     reservations:
+    #       devices:
+    #         - driver: nvidia
+    #           count: 1
+    #           capabilities: [gpu]
 
   immich-machine-learning:
     container_name: immich_machine_learning

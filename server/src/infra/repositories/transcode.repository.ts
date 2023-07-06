@@ -37,7 +37,7 @@ export class TranscodeRepository implements ITranscodeRepository {
   transcode(input: string, output: string, options: TranscodeOptions): Promise<void> {
     if (!options.twoPass) {
       return new Promise((resolve, reject) => {
-        ffmpeg(input, { niceness: 10 })
+        ffmpeg(input, { niceness: 10, stdoutLines: 0 })
           .inputOptions(options.inputOptions)
           .outputOptions(options.outputOptions)
           .output(output)

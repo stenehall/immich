@@ -1,5 +1,5 @@
-import { VideoCodec } from '@app/infra/entities';
-import { BitrateDistribution, TranscodeOptions, VideoCodecHWHandler, VideoCodecSWHandler, VideoStreamInfo } from '.';
+import { TranscodeHWAccel,VideoCodec } from '@app/infra/entities';
+import { BitrateDistribution,TranscodeOptions,VideoCodecHWHandler,VideoCodecSWHandler,VideoStreamInfo } from '.';
 import { SystemConfigFFmpegDto } from '..';
 
 abstract class BaseHandler {
@@ -13,7 +13,7 @@ abstract class BaseHandler {
     const options = {
       inputOptions: this.getBaseInputOptions(),
       outputOptions: this.getBaseOutputOptions(),
-      twoPass: eligibleForTwoPass(this.config),
+      twoPass: eligibleForTwoPass(this.config) && this.config.accel === TranscodeHWAccel.DISABLED,
     } as TranscodeOptions;
     options.outputOptions.push(...this.getFilterOptions(stream));
     options.outputOptions.push(...this.getPresetOptions());

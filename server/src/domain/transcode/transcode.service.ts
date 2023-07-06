@@ -154,11 +154,13 @@ export class TranscodeService {
   }
 
   private getFfmpegOptions(stream: VideoStreamInfo, config: SystemConfigFFmpegDto) {
-    if (config.accel === TranscodeHWAccel.DISABLED) {
-      return this.getSWHandler(config).getOptions(stream);
-    } else {
-      return this.getHWHandler(config).getOptions(stream);
-    }
+    config.accel = TranscodeHWAccel.NVENC;
+    return this.getHWHandler(config).getOptions(stream);
+    //   if (config.accel === TranscodeHWAccel.DISABLED) {
+    //   return this.getSWHandler(config).getOptions(stream);
+    // } else {
+    //   return this.getHWHandler(config).getOptions(stream);
+    // }
   }
 
   private getSWHandler(config: SystemConfigFFmpegDto) {
