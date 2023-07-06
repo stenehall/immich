@@ -3,7 +3,7 @@
     notificationController,
     NotificationType,
   } from '$lib/components/shared-components/notification/notification';
-  import { api, SystemConfigFFmpegDto, SystemConfigFFmpegDtoTranscodeEnum } from '@api';
+  import { api, SystemConfigFFmpegDto, TranscodePolicy, AudioCodec, VideoCodec, TranscodeHWAccel } from '@api';
   import SettingButtonsRow from '../setting-buttons-row.svelte';
   import SettingInputField, { SettingInputFieldType } from '../setting-input-field.svelte';
   import SettingSelect from '../setting-select.svelte';
@@ -95,15 +95,15 @@
             bind:value={ffmpegConfig.preset}
             name="preset"
             options={[
-              { value: 'ultrafast', text: 'ultrafast' },
-              { value: 'superfast', text: 'superfast' },
-              { value: 'veryfast', text: 'veryfast' },
-              { value: 'faster', text: 'faster' },
-              { value: 'fast', text: 'fast' },
-              { value: 'medium', text: 'medium' },
-              { value: 'slow', text: 'slow' },
-              { value: 'slower', text: 'slower' },
-              { value: 'veryslow', text: 'veryslow' },
+              { value: 'ultrafast', text: 'Ultrafast' },
+              { value: 'superfast', text: 'Superfast' },
+              { value: 'veryfast', text: 'Veryfast' },
+              { value: 'faster', text: 'Faster' },
+              { value: 'fast', text: 'Fast' },
+              { value: 'medium', text: 'Medium' },
+              { value: 'slow', text: 'Slow' },
+              { value: 'slower', text: 'Slower' },
+              { value: 'veryslow', text: 'Veryslow' },
             ]}
             isEdited={!(ffmpegConfig.preset == savedConfig.preset)}
           />
@@ -113,9 +113,9 @@
             desc="Opus is the highest quality option, but has lower compatibility with old devices or software."
             bind:value={ffmpegConfig.targetAudioCodec}
             options={[
-              { value: 'aac', text: 'aac' },
-              { value: 'mp3', text: 'mp3' },
-              { value: 'opus', text: 'opus' },
+              { value: AudioCodec.AAC, text: 'AAC' },
+              { value: AudioCodec.MP3, text: 'MP3' },
+              { value: AudioCodec.OPUS, text: 'Opus' },
             ]}
             name="acodec"
             isEdited={!(ffmpegConfig.targetAudioCodec == savedConfig.targetAudioCodec)}
@@ -126,9 +126,9 @@
             desc="VP9 has high efficiency and web compatibility, but takes longer to transcode. HEVC performs similarly, but has lower web compatibility. H.264 is widely compatible and quick to transcode, but produces much larger files."
             bind:value={ffmpegConfig.targetVideoCodec}
             options={[
-              { value: 'h264', text: 'h264' },
-              { value: 'hevc', text: 'hevc' },
-              { value: 'vp9', text: 'vp9' },
+              { value: VideoCodec.H264, text: 'H.264' },
+              { value: VideoCodec.HEVC, text: 'HEVC' },
+              { value: VideoCodec.VP9, text: 'VP9' },
             ]}
             name="vcodec"
             isEdited={!(ffmpegConfig.targetVideoCodec == savedConfig.targetVideoCodec)}
@@ -167,26 +167,49 @@
           />
 
           <SettingSelect
-            label="TRANSCODE"
+            label="TRANSCODE POLICY"
             desc="Policy for when a video should be transcoded."
             bind:value={ffmpegConfig.transcode}
             name="transcode"
             options={[
-              { value: SystemConfigFFmpegDtoTranscodeEnum.All, text: 'All videos' },
+              { value: TranscodePolicy.ALL, text: 'All videos' },
               {
-                value: SystemConfigFFmpegDtoTranscodeEnum.Optimal,
+                value: TranscodePolicy.OPTIMAL,
                 text: 'Videos higher than target resolution or not in the desired format',
               },
               {
-                value: SystemConfigFFmpegDtoTranscodeEnum.Required,
+                value: TranscodePolicy.REQUIRED,
                 text: 'Only videos not in the desired format',
               },
               {
-                value: SystemConfigFFmpegDtoTranscodeEnum.Disabled,
+                value: TranscodePolicy.DISABLED,
                 text: "Don't transcode any videos, may break playback on some clients",
               },
             ]}
             isEdited={!(ffmpegConfig.transcode == savedConfig.transcode)}
+          />
+
+          <SettingSelect
+            label="HARDWARE ACCELERATION"
+            desc="Experimental. Use hardware to transcode instead of software. Much faster, but will have lower quality at the same bitrate. This setting is 'best effort': it will fallback to software transcoding on failure."
+            bind:value={ffmpegConfig.accel}
+            name="accel"
+            options={[
+              { value: TranscodeHWAccel.NVENC, text: 'NVENC (requires Nvidia GPU)' },
+              {
+                value: TranscodeHWAccel.QSV,
+                text: 'Quick Sync (requires 7th gen Intel CPU or later)',
+              },
+              {
+                value: TranscodeHWAccel.VAAPI,
+                text: "VAAPI (requires Linux server)",
+              },
+              {
+                value: TranscodeHWAccel.DISABLED,
+                text: "Disabled",
+              }
+            ]}
+            isEdited={!(ffmpegConfig.accel == savedConfig.accel)}
           />
 
           <SettingSwitch

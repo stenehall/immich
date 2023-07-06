@@ -208,7 +208,7 @@ export class QSVHandler extends BaseHandler implements VideoCodecHWHandler {
   }
 
   getBaseInputOptions() {
-    return ['-hwaccel qsv'];
+    return ['-hwaccel qsv', '-hwaccel_output_format qsv'];
   }
 
   getBaseOutputOptions() {
@@ -271,7 +271,7 @@ export class VAAPIHandler extends BaseHandler implements VideoCodecHWHandler {
 
   getFilterOptions(stream: VideoStreamInfo) {
     if (!shouldScale(stream, this.config)) {
-      return [];
+      return ['-vf hwupload'];
     }
 
     return [`-vf hwupload,scale_vaapi=${getScaling(stream, this.config)}`];
@@ -289,7 +289,11 @@ export class VAAPIHandler extends BaseHandler implements VideoCodecHWHandler {
   getBitrateOptions() {
     const bitrates = getBitrateDistribution(this.config);
     if (bitrates.max > 0) {
-      return [`-global_quality ${this.config.crf}`, `-maxrate ${bitrates.max}${bitrates.unit}`];
+      return [
+        `-q ${this.config.crf} -rc_mode icq`,
+        `-global_quality ${this.config.crf}`,
+        `-maxrate ${bitrates.max}${bitrates.unit}`,
+      ];
     } else {
       return [`-q ${this.config.crf} -rc_mode icq`];
     }

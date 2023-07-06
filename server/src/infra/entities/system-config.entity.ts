@@ -74,7 +74,6 @@ export enum AudioCodec {
 export enum TranscodeHWAccel {
   NVENC = 'nvenc',
   QSV = 'qsv',
-  DXVA2 = 'dxva2',
   VAAPI = 'vaapi',
   DISABLED = 'disabled',
 }

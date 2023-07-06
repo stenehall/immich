@@ -25,7 +25,6 @@ class TranscodeHWAccel {
 
   static const NVENC = TranscodeHWAccel._(r'nvenc');
   static const QSV = TranscodeHWAccel._(r'qsv');
-  static const DXVA2 = TranscodeHWAccel._(r'dxva2');
   static const VAAPI = TranscodeHWAccel._(r'vaapi');
   static const DISABLED = TranscodeHWAccel._(r'disabled');
 
@@ -33,7 +32,6 @@ class TranscodeHWAccel {
   static const values = <TranscodeHWAccel>[
     NVENC,
     QSV,
-    DXVA2,
     VAAPI,
     DISABLED,
   ];
@@ -76,7 +74,6 @@ class TranscodeHWAccelTypeTransformer {
       switch (data) {
         case r'nvenc': return TranscodeHWAccel.NVENC;
         case r'qsv': return TranscodeHWAccel.QSV;
-        case r'dxva2': return TranscodeHWAccel.DXVA2;
         case r'vaapi': return TranscodeHWAccel.VAAPI;
         case r'disabled': return TranscodeHWAccel.DISABLED;
         default:

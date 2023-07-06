@@ -6828,14 +6828,12 @@
         "enum": [
           "nvenc",
           "qsv",
-          "dxva2",
           "vaapi",
           "disabled"
         ],
         "x-enum-varnames": [
           "NVENC",
           "QSV",
-          "DXVA2",
           "VAAPI",
           "DISABLED"
         ]

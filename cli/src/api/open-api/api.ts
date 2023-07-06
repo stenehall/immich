@@ -2777,7 +2777,6 @@ export type TimeGroupEnum = typeof TimeGroupEnum[keyof typeof TimeGroupEnum];
 export const TranscodeHWAccel = {
     NVENC: 'nvenc',
     QSV: 'qsv',
-    DXVA2: 'dxva2',
     VAAPI: 'vaapi',
     DISABLED: 'disabled'
 } as const;

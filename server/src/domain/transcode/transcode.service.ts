@@ -154,13 +154,11 @@ export class TranscodeService {
   }
 
   private getFfmpegOptions(stream: VideoStreamInfo, config: SystemConfigFFmpegDto) {
-    config.accel = TranscodeHWAccel.NVENC;
-    return this.getHWHandler(config).getOptions(stream);
-    //   if (config.accel === TranscodeHWAccel.DISABLED) {
-    //   return this.getSWHandler(config).getOptions(stream);
-    // } else {
-    //   return this.getHWHandler(config).getOptions(stream);
-    // }
+    if (config.accel === TranscodeHWAccel.DISABLED) {
+      return this.getSWHandler(config).getOptions(stream);
+    } else {
+      return this.getHWHandler(config).getOptions(stream);
+    }
   }
 
   private getSWHandler(config: SystemConfigFFmpegDto) {
@@ -189,6 +187,9 @@ export class TranscodeService {
         break;
       case TranscodeHWAccel.QSV:
         handler = new QSVHandler(config);
+        break;
+      case TranscodeHWAccel.VAAPI:
+        handler = new VAAPIHandler(config);
         break;
       default:
         throw new UnsupportedMediaTypeException(`${config.accel} acceleration is unsupported`);
