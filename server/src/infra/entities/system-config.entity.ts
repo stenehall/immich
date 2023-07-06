@@ -1,5 +1,5 @@
 import { QueueName } from '@app/domain/job/job.constants';
-import { Column,Entity,PrimaryColumn } from 'typeorm';
+import { Column, Entity, PrimaryColumn } from 'typeorm';
 
 @Entity('system_config')
 export class SystemConfigEntity<T = SystemConfigValue> {
@@ -59,13 +59,33 @@ export enum TranscodePolicy {
   DISABLED = 'disabled',
 }
 
+export enum VideoCodec {
+  H264 = 'h264',
+  HEVC = 'hevc',
+  VP9 = 'vp9',
+}
+
+export enum AudioCodec {
+  MP3 = 'mp3',
+  AAC = 'aac',
+  OPUS = 'libopus',
+}
+
+export enum TranscodeHWAccel {
+  NVENC = 'nvenc',
+  QSV = 'qsv',
+  DXVA2 = 'dxva2',
+  VAAPI = 'vaapi',
+  DISABLED = 'disabled',
+}
+
 export interface SystemConfig {
   ffmpeg: {
     crf: number;
     threads: number;
     preset: string;
-    targetVideoCodec: string;
-    targetAudioCodec: string;
+    targetVideoCodec: VideoCodec;
+    targetAudioCodec: AudioCodec;
     targetResolution: string;
     maxBitrate: string;
     twoPass: boolean;

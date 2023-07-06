@@ -29,6 +29,7 @@ export interface VideoInfo {
 }
 
 export interface TranscodeOptions {
+  inputOptions: string[];
   outputOptions: string[];
   twoPass: boolean;
 }

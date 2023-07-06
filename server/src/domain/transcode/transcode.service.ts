@@ -14,7 +14,15 @@ import {
   VideoCodecSWHandler,
   VideoStreamInfo,
 } from './transcode.repository';
-import { H264Handler, HEVCHandler, NVENCHandler, QSVHandler, shouldScale, VP9Handler } from './transcode.util';
+import {
+  H264Handler,
+  HEVCHandler,
+  NVENCHandler,
+  QSVHandler,
+  shouldScale,
+  VAAPIHandler,
+  VP9Handler,
+} from './transcode.util';
 
 @Injectable()
 export class TranscodeService {
@@ -146,38 +154,23 @@ export class TranscodeService {
   }
 
   private getFfmpegOptions(stream: VideoStreamInfo, config: SystemConfigFFmpegDto) {
-    const options = {
-      outputOptions: [
-        `-vcodec ${config.targetVideoCodec}`,
-        `-acodec ${config.targetAudioCodec}`,
-        // Makes a second pass moving the moov atom to the beginning of
-        // the file for improved playback speed.
-        '-movflags faststart',
-        '-fps_mode passthrough',
-      ],
-      twoPass: eligibleForTwoPass(config),
-    } as TranscodeOptions;
-
-    const handler = this.getHandler(config);
-
-    options.outputOptions.push(...handler.getScalingOptions(stream));
-    options.outputOptions.push(...handler.getPresetOptions());
-    options.outputOptions.push(...handler.getThreadOptions());
-    options.outputOptions.push(...handler.getBitrateOptions());
-
-    return options;
+    if (config.accel === TranscodeHWAccel.DISABLED) {
+      return this.getSWHandler(config).getOptions(stream);
+    } else {
+      return this.getHWHandler(config).getOptions(stream);
+    }
   }
 
-  private getHandler(config: SystemConfigFFmpegDto) {
-    let handler: CodecHandler;
+  private getSWHandler(config: SystemConfigFFmpegDto) {
+    let handler: VideoCodecSWHandler;
     switch (config.targetVideoCodec) {
-      case 'h264':
+      case VideoCodec.H264:
         handler = new H264Handler(config);
         break;
-      case 'hevc':
+      case VideoCodec.HEVC:
         handler = new HEVCHandler(config);
         break;
-      case 'vp9':
+      case VideoCodec.VP9:
         handler = new VP9Handler(config);
         break;
       default:
@@ -185,109 +178,18 @@ export class TranscodeService {
     }
     return handler;
   }
-}
 
-class H264Handler implements CodecHandler {
-  protected config: SystemConfigFFmpegDto;
-
-  constructor(config: SystemConfigFFmpegDto) {
-    this.config = config;
-  }
-
-  getScalingOptions(stream: VideoStreamInfo) {
-    if (!shouldScale(stream, this.config)) {
-      return [];
-    }
-    const targetResolution = getTargetResolution(stream, this.config);
-    const scaling = isVideoVertical(stream) ? `${targetResolution}:-2` : `-2:${targetResolution}`;
-
-    return [`-vf scale=${scaling}`];
-  }
-
-  getPresetOptions() {
-    return [`-preset ${this.config.preset}`];
-  }
-
-  getBitrateOptions() {
-    const bitrates = getBitrateDistribution(this.config);
-    if (eligibleForTwoPass(this.config)) {
-      return [
-        `-b:v ${bitrates.target}${bitrates.unit}`,
-        `-minrate ${bitrates.min}${bitrates.unit}`,
-        `-maxrate ${bitrates.max}${bitrates.unit}`,
-      ];
-    } else if (bitrates.max > 0) {
-      // -bufsize is the peak possible bitrate at any moment, while -maxrate is the max rolling average bitrate
-      // needed for -maxrate to be enforced
-      return [
-        `-crf ${this.config.crf}`,
-        `-maxrate ${bitrates.max}${bitrates.unit}`,
-        `-bufsize ${bitrates.max * 2}${bitrates.unit}`,
-      ];
-    } else {
-      return [`-crf ${this.config.crf}`];
-    }
-  }
-
-  getThreadOptions() {
-    if (this.config.threads <= 0) {
-      return [];
-    }
-    return [
-      `-threads ${this.config.threads}`,
-      '-x264-params "pools=none"',
-      `-x264-params "frame-threads=${this.config.threads}"`,
-    ];
-  }
-}
-
-class HEVCHandler extends H264Handler {
-  getThreadOptions() {
-    if (this.config.threads <= 0) {
-      return [];
-    }
-    return [
-      `-threads ${this.config.threads}`,
-      '-x265-params "pools=none"',
-      `-x265-params "frame-threads=${this.config.threads}"`,
-    ];
-  }
-}
-
-class VP9Handler implements CodecHandler {
-  protected config: SystemConfigFFmpegDto;
-
-  constructor(config: SystemConfigFFmpegDto) {
-    this.config = config;
-  }
-  getScalingOptions(stream: VideoStreamInfo) {
-    if (!shouldScale(stream, this.config)) {
-      return [];
-    }
-    const targetResolution = getTargetResolution(stream, this.config);
-    const scaling = isVideoVertical(stream) ? `${targetResolution}:-2` : `-2:${targetResolution}`;
-
-    return [`-vf scale=${scaling}`];
-  }
-
-  getPresetOptions() {
-    const presets = ['veryslow', 'slower', 'slow', 'medium', 'fast', 'faster', 'veryfast', 'superfast', 'ultrafast'];
-
-    const speed = Math.min(presets.indexOf(this.config.preset), 5); // values over 5 require realtime mode, which is its own can of worms since it overrides -crf and -threads
-    if (speed >= 0) {
-      return [`-cpu-used ${speed}`];
-    }
-    return [];
-  }
-
-  getBitrateOptions() {
-    const bitrates = getBitrateDistribution(this.config);
-    if (eligibleForTwoPass(this.config)) {
-      return [
-        `-b:v ${bitrates.target}${bitrates.unit}`,
-        `-minrate ${bitrates.min}${bitrates.unit}`,
-        `-maxrate ${bitrates.max}${bitrates.unit}`,
-      ];
+  private getHWHandler(config: SystemConfigFFmpegDto) {
+    let handler: VideoCodecHWHandler;
+    switch (config.accel) {
+      case TranscodeHWAccel.NVENC:
+        handler = new NVENCHandler(config);
+        break;
+      case TranscodeHWAccel.QSV:
+        handler = new QSVHandler(config);
+        break;
+      default:
+        throw new UnsupportedMediaTypeException(`${config.accel} acceleration is unsupported`);
     }
     if (!handler.getSupportedCodecs().includes(config.targetVideoCodec)) {
       throw new UnsupportedMediaTypeException(
@@ -296,59 +198,7 @@ class VP9Handler implements CodecHandler {
         }'. Supported codecs: ${handler.getSupportedCodecs()}`,
       );
     }
-    return ['-row-mt 1'];
+
+    return handler;
   }
-}
-
-function eligibleForTwoPass(config: SystemConfigFFmpegDto) {
-  if (!config.twoPass) {
-    return false;
-  }
-
-  return isBitrateConstrained(config) || config.targetVideoCodec === 'vp9';
-}
-
-function getBitrateDistribution(ffmpeg: SystemConfigFFmpegDto) {
-  const max = getMaxBitrateValue(ffmpeg);
-  const target = Math.ceil(max / 1.45); // recommended by https://developers.google.com/media/vp9/settings/vod
-  const min = target / 2;
-  const unit = getBitrateUnit(ffmpeg);
-
-  return { max, target, min, unit } as BitrateDistribution;
-}
-
-function getTargetResolution(stream: VideoStreamInfo, ffmpeg: SystemConfigFFmpegDto) {
-  if (ffmpeg.targetResolution === 'original') {
-    return Math.min(stream.height, stream.width);
-  }
-
-  return Number.parseInt(ffmpeg.targetResolution);
-}
-
-function shouldScale(stream: VideoStreamInfo, ffmpeg: SystemConfigFFmpegDto) {
-  if (ffmpeg.targetResolution === 'original') {
-    return false;
-  }
-  return Math.min(stream.height, stream.width) > Number.parseInt(ffmpeg.targetResolution);
-}
-
-function isVideoRotated(stream: VideoStreamInfo) {
-  return Math.abs(stream.rotation) === 90;
-}
-
-function isVideoVertical(stream: VideoStreamInfo) {
-  return stream.height > stream.width || isVideoRotated(stream);
-}
-
-function isBitrateConstrained(ffmpeg: SystemConfigFFmpegDto) {
-  return getMaxBitrateValue(ffmpeg) > 0;
-}
-
-function getBitrateUnit(ffmpeg: SystemConfigFFmpegDto) {
-  const maxBitrate = getMaxBitrateValue(ffmpeg);
-  return ffmpeg.maxBitrate.trim().substring(maxBitrate.toString().length); // use inputted unit if provided
-}
-
-function getMaxBitrateValue(ffmpeg: SystemConfigFFmpegDto) {
-  return Number.parseInt(ffmpeg.maxBitrate) || 0;
 }

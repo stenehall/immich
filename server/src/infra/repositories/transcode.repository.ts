@@ -38,6 +38,7 @@ export class TranscodeRepository implements ITranscodeRepository {
     if (!options.twoPass) {
       return new Promise((resolve, reject) => {
         ffmpeg(input, { niceness: 10 })
+          .inputOptions(options.inputOptions)
           .outputOptions(options.outputOptions)
           .output(output)
           .on('error', (err, stdout, stderr) => {
@@ -53,6 +54,7 @@ export class TranscodeRepository implements ITranscodeRepository {
     // recommended for vp9 for better quality and compression
     return new Promise((resolve, reject) => {
       ffmpeg(input, { niceness: 10 })
+        .inputOptions(options.inputOptions)
         .outputOptions(options.outputOptions)
         .addOptions('-pass', '1')
         .addOptions('-passlogfile', output)
@@ -62,6 +64,7 @@ export class TranscodeRepository implements ITranscodeRepository {
         .on('end', () => {
           // second pass
           ffmpeg(input, { niceness: 10 })
+            .inputOptions(options.inputOptions)
             .outputOptions(options.outputOptions)
             .addOptions('-pass', '2')
             .addOptions('-passlogfile', output)
