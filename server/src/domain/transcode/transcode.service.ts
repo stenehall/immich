@@ -1,4 +1,4 @@
-import { AssetEntity, AssetType, TranscodePreset } from '@app/infra/entities';
+import { AssetEntity, AssetType, TranscodeHWAccel, TranscodePolicy, VideoCodec } from '@app/infra/entities';
 import { Inject, Injectable, Logger, UnsupportedMediaTypeException } from '@nestjs/common';
 import { join } from 'path';
 import { IAssetRepository, WithoutProperty } from '../asset';
@@ -9,12 +9,12 @@ import { ISystemConfigRepository, SystemConfigFFmpegDto } from '../system-config
 import { SystemConfigCore } from '../system-config/system-config.core';
 import {
   AudioStreamInfo,
-  BitrateDistribution,
-  CodecHandler,
   ITranscodeRepository,
-  TranscodeOptions,
+  VideoCodecHWHandler,
+  VideoCodecSWHandler,
   VideoStreamInfo,
 } from './transcode.repository';
+import { H264Handler, HEVCHandler, NVENCHandler, QSVHandler, shouldScale, VP9Handler } from './transcode.util';
 
 @Injectable()
 export class TranscodeService {
@@ -77,8 +77,18 @@ export class TranscodeService {
     }
 
     const transcodeOptions = this.getFfmpegOptions(mainVideoStream, config);
-    this.logger.log(`Start encoding video ${asset.id} ${transcodeOptions}`);
-    await this.transcodeRepository.transcode(input, output, transcodeOptions);
+    this.logger.log(`Start encoding video ${asset.id} ${JSON.stringify(transcodeOptions)}`);
+    try {
+      await this.transcodeRepository.transcode(input, output, transcodeOptions);
+    } catch (err) {
+      this.logger.error(err);
+      if (config.accel !== TranscodeHWAccel.DISABLED) {
+        this.logger.error(`Error occurred during transcoding. Retrying with ${config.accel} acceleration disabled.`);
+      }
+      config.accel = TranscodeHWAccel.DISABLED;
+      const transcodeOptions = this.getFfmpegOptions(mainVideoStream, config);
+      await this.transcodeRepository.transcode(input, output, transcodeOptions);
+    }
 
     this.logger.log(`Encoding success ${asset.id}`);
 
@@ -118,16 +128,16 @@ export class TranscodeService {
     const allTargetsMatching = isTargetVideoCodec && isTargetAudioCodec && isTargetContainer;
 
     switch (ffmpegConfig.transcode) {
-      case TranscodePreset.DISABLED:
+      case TranscodePolicy.DISABLED:
         return false;
 
-      case TranscodePreset.ALL:
+      case TranscodePolicy.ALL:
         return true;
 
-      case TranscodePreset.REQUIRED:
+      case TranscodePolicy.REQUIRED:
         return !allTargetsMatching;
 
-      case TranscodePreset.OPTIMAL:
+      case TranscodePolicy.OPTIMAL:
         return !allTargetsMatching || shouldScale(videoStream, ffmpegConfig);
 
       default:
@@ -279,13 +289,12 @@ class VP9Handler implements CodecHandler {
         `-maxrate ${bitrates.max}${bitrates.unit}`,
       ];
     }
-
-    return [`-crf ${this.config.crf}`, `-b:v ${bitrates.max}${bitrates.unit}`];
-  }
-
-  getThreadOptions() {
-    if (this.config.threads) {
-      return ['-row-mt 1', `-threads ${this.config.threads}`];
+    if (!handler.getSupportedCodecs().includes(config.targetVideoCodec)) {
+      throw new UnsupportedMediaTypeException(
+        `${config.accel} acceleration does not support codec '${
+          config.targetVideoCodec
+        }'. Supported codecs: ${handler.getSupportedCodecs()}`,
+      );
     }
     return ['-row-mt 1'];
   }

@@ -1,4 +1,4 @@
-import { SystemConfigFFmpegDto } from '../system-config';
+import { VideoCodec } from '@app/infra/entities';
 
 export const ITranscodeRepository = 'ITranscodeRepository';
 
@@ -40,11 +40,12 @@ export interface BitrateDistribution {
   unit: string;
 }
 
-export interface CodecHandler {
-  getScalingOptions(stream: VideoStreamInfo): Array<string>;
-  getPresetOptions(): Array<string>;
-  getBitrateOptions(): Array<string>;
-  getThreadOptions(): Array<string>;
+export interface VideoCodecSWHandler {
+  getOptions(stream: VideoStreamInfo): TranscodeOptions;
+}
+
+export interface VideoCodecHWHandler extends VideoCodecSWHandler {
+  getSupportedCodecs(): Array<VideoCodec>;
 }
 
 export interface ITranscodeRepository {

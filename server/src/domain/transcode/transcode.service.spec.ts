@@ -89,6 +89,7 @@ describe(TranscodeService.name, () => {
         '/original/path.ext',
         'upload/encoded-video/user-id/asset-id.mp4',
         {
+          inputOptions: [],
           outputOptions: [
             '-vcodec h264',
             '-acodec aac',
@@ -125,6 +126,7 @@ describe(TranscodeService.name, () => {
         '/original/path.ext',
         'upload/encoded-video/user-id/asset-id.mp4',
         {
+          inputOptions: [],
           outputOptions: [
             '-vcodec h264',
             '-acodec aac',
@@ -146,6 +148,7 @@ describe(TranscodeService.name, () => {
         '/original/path.ext',
         'upload/encoded-video/user-id/asset-id.mp4',
         {
+          inputOptions: [],
           outputOptions: [
             '-vcodec h264',
             '-acodec aac',
@@ -171,6 +174,7 @@ describe(TranscodeService.name, () => {
         '/original/path.ext',
         'upload/encoded-video/user-id/asset-id.mp4',
         {
+          inputOptions: [],
           outputOptions: [
             '-vcodec h264',
             '-acodec aac',
@@ -193,6 +197,7 @@ describe(TranscodeService.name, () => {
         '/original/path.ext',
         'upload/encoded-video/user-id/asset-id.mp4',
         {
+          inputOptions: [],
           outputOptions: [
             '-vcodec h264',
             '-acodec aac',
@@ -216,6 +221,7 @@ describe(TranscodeService.name, () => {
         '/original/path.ext',
         'upload/encoded-video/user-id/asset-id.mp4',
         {
+          inputOptions: [],
           outputOptions: [
             '-vcodec h264',
             '-acodec aac',
@@ -239,6 +245,7 @@ describe(TranscodeService.name, () => {
         '/original/path.ext',
         'upload/encoded-video/user-id/asset-id.mp4',
         {
+          inputOptions: [],
           outputOptions: [
             '-vcodec h264',
             '-acodec aac',
@@ -270,6 +277,7 @@ describe(TranscodeService.name, () => {
         '/original/path.ext',
         'upload/encoded-video/user-id/asset-id.mp4',
         {
+          inputOptions: [],
           outputOptions: [
             '-vcodec h264',
             '-acodec aac',
@@ -298,6 +306,7 @@ describe(TranscodeService.name, () => {
         '/original/path.ext',
         'upload/encoded-video/user-id/asset-id.mp4',
         {
+          inputOptions: [],
           outputOptions: [
             '-vcodec h264',
             '-acodec aac',
@@ -323,6 +332,7 @@ describe(TranscodeService.name, () => {
         '/original/path.ext',
         'upload/encoded-video/user-id/asset-id.mp4',
         {
+          inputOptions: [],
           outputOptions: [
             '-vcodec h264',
             '-acodec aac',
@@ -349,6 +359,7 @@ describe(TranscodeService.name, () => {
         '/original/path.ext',
         'upload/encoded-video/user-id/asset-id.mp4',
         {
+          inputOptions: [],
           outputOptions: [
             '-vcodec vp9',
             '-acodec aac',
@@ -378,6 +389,7 @@ describe(TranscodeService.name, () => {
         '/original/path.ext',
         'upload/encoded-video/user-id/asset-id.mp4',
         {
+          inputOptions: [],
           outputOptions: [
             '-vcodec vp9',
             '-acodec aac',
@@ -404,6 +416,7 @@ describe(TranscodeService.name, () => {
         '/original/path.ext',
         'upload/encoded-video/user-id/asset-id.mp4',
         {
+          inputOptions: [],
           outputOptions: [
             '-vcodec h264',
             '-acodec aac',

@@ -6344,11 +6344,14 @@
           "preset": {
             "type": "string"
           },
+          "thumbnailGeneration": {
+            "$ref": "#/components/schemas/JobSettingsDto"
+          },
           "targetVideoCodec": {
-            "type": "string"
+            "$ref": "#/components/schemas/VideoCodec"
           },
           "targetAudioCodec": {
-            "type": "string"
+            "$ref": "#/components/schemas/AudioCodec"
           },
           "targetResolution": {
             "type": "string"
@@ -6360,13 +6363,10 @@
             "type": "boolean"
           },
           "transcode": {
-            "type": "string",
-            "enum": [
-              "all",
-              "optimal",
-              "required",
-              "disabled"
-            ]
+            "$ref": "#/components/schemas/TranscodePolicy"
+          },
+          "accel": {
+            "$ref": "#/components/schemas/TranscodeHWAccel"
           }
         },
         "required": [
@@ -6378,7 +6378,8 @@
           "targetResolution",
           "maxBitrate",
           "twoPass",
-          "transcode"
+          "transcode",
+          "accel"
         ]
       },
       "SystemConfigJobDto": {
@@ -6797,6 +6798,60 @@
         },
         "required": [
           "authStatus"
+        ]
+      },
+      "VideoCodec": {
+        "enum": [
+          "h264",
+          "hevc",
+          "vp9"
+        ],
+        "x-enum-varnames": [
+          "H264",
+          "HEVC",
+          "VP9"
+        ]
+      },
+      "AudioCodec": {
+        "enum": [
+          "mp3",
+          "aac",
+          "opus"
+        ],
+        "x-enum-varnames": [
+          "MP3",
+          "AAC",
+          "OPUS"
+        ]
+      },
+      "TranscodeHWAccel": {
+        "enum": [
+          "nvenc",
+          "qsv",
+          "dxva2",
+          "vaapi",
+          "disabled"
+        ],
+        "x-enum-varnames": [
+          "NVENC",
+          "QSV",
+          "DXVA2",
+          "VAAPI",
+          "DISABLED"
+        ]
+      },
+      "TranscodePolicy": {
+        "enum": [
+          "all",
+          "optimal",
+          "required",
+          "disabled"
+        ],
+        "x-enum-varnames": [
+          "ALL",
+          "OPTIMAL",
+          "REQUIRED",
+          "DISABLED"
         ]
       }
     }

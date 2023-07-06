@@ -1,5 +1,5 @@
 import { QueueName } from '@app/domain/job/job.constants';
-import { Column, Entity, PrimaryColumn } from 'typeorm';
+import { Column,Entity,PrimaryColumn } from 'typeorm';
 
 @Entity('system_config')
 export class SystemConfigEntity<T = SystemConfigValue> {
@@ -23,6 +23,7 @@ export enum SystemConfigKey {
   FFMPEG_MAX_BITRATE = 'ffmpeg.maxBitrate',
   FFMPEG_TWO_PASS = 'ffmpeg.twoPass',
   FFMPEG_TRANSCODE = 'ffmpeg.transcode',
+  FFMPEG_ACCEL = 'ffmpeg.accel',
 
   JOB_THUMBNAIL_GENERATION_CONCURRENCY = 'job.thumbnailGeneration.concurrency',
   JOB_METADATA_EXTRACTION_CONCURRENCY = 'job.metadataExtraction.concurrency',
@@ -51,7 +52,7 @@ export enum SystemConfigKey {
   STORAGE_TEMPLATE = 'storageTemplate.template',
 }
 
-export enum TranscodePreset {
+export enum TranscodePolicy {
   ALL = 'all',
   OPTIMAL = 'optimal',
   REQUIRED = 'required',
@@ -68,7 +69,8 @@ export interface SystemConfig {
     targetResolution: string;
     maxBitrate: string;
     twoPass: boolean;
-    transcode: TranscodePreset;
+    transcode: TranscodePolicy;
+    accel: TranscodeHWAccel;
   };
   job: Record<QueueName, { concurrency: number }>;
   oauth: {

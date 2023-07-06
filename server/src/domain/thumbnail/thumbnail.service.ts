@@ -1,11 +1,11 @@
 import { AssetType } from '@app/infra/entities';
-import { Inject, Injectable, Logger } from '@nestjs/common';
+import { Inject,Injectable,Logger } from '@nestjs/common';
 import { join } from 'path';
-import { IAssetRepository, WithoutProperty } from '../asset';
+import { IAssetRepository,WithoutProperty } from '../asset';
 import { usePagination } from '../domain.util';
-import { IBaseJob, IEntityJob, IJobRepository, JobName, JOBS_ASSET_PAGINATION_SIZE } from '../job';
-import { IStorageRepository, StorageCore, StorageFolder } from '../storage';
-import { JPEG_THUMBNAIL_SIZE, WEBP_THUMBNAIL_SIZE } from './thumbnail.constant';
+import { IBaseJob,IEntityJob,IJobRepository,JobName,JOBS_ASSET_PAGINATION_SIZE } from '../job';
+import { IStorageRepository,StorageCore,StorageFolder } from '../storage';
+import { JPEG_THUMBNAIL_SIZE,WEBP_THUMBNAIL_SIZE } from './thumbnail.constant';
 import { IThumbnailRepository } from './thumbnail.repository';
 
 @Injectable()
@@ -59,10 +59,12 @@ export class ThumbnailService {
 
     switch (asset.type) {
       case AssetType.IMAGE:
+        this.logger.log('Generating image thumbnail');
         await this.mediaRepository.resize(asset.originalPath, jpegThumbnailPath, {
           size: JPEG_THUMBNAIL_SIZE,
           format: 'jpeg',
         });
+        this.logger.log(`Successfully generated image thumbnail ${asset.id}`);
         break;
       case AssetType.VIDEO:
         this.logger.log('Generating video thumbnail');

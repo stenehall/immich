@@ -1,9 +1,12 @@
 import {
+  AudioCodec,
   SystemConfig,
   SystemConfigEntity,
   SystemConfigKey,
   SystemConfigValue,
-  TranscodePreset,
+  TranscodeHWAccel,
+  TranscodePolicy,
+  VideoCodec,
 } from '@app/infra/entities';
 import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import * as _ from 'lodash';
@@ -19,12 +22,13 @@ const defaults = Object.freeze<SystemConfig>({
     crf: 23,
     threads: 0,
     preset: 'ultrafast',
-    targetVideoCodec: 'h264',
-    targetAudioCodec: 'aac',
+    targetVideoCodec: VideoCodec.H264,
+    targetAudioCodec: AudioCodec.AAC,
     targetResolution: '720',
     maxBitrate: '0',
     twoPass: false,
-    transcode: TranscodePreset.REQUIRED,
+    transcode: TranscodePolicy.REQUIRED,
+    accel: TranscodeHWAccel.DISABLED,
   },
   job: {
     [QueueName.BACKGROUND_TASK]: { concurrency: 5 },

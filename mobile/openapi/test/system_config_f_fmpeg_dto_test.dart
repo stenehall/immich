@@ -31,12 +31,17 @@ void main() {
       // TODO
     });
 
-    // String targetVideoCodec
+    // JobSettingsDto thumbnailGeneration
+    test('to test the property `thumbnailGeneration`', () async {
+      // TODO
+    });
+
+    // VideoCodec targetVideoCodec
     test('to test the property `targetVideoCodec`', () async {
       // TODO
     });
 
-    // String targetAudioCodec
+    // AudioCodec targetAudioCodec
     test('to test the property `targetAudioCodec`', () async {
       // TODO
     });
@@ -56,8 +61,13 @@ void main() {
       // TODO
     });
 
-    // String transcode
+    // TranscodePolicy transcode
     test('to test the property `transcode`', () async {
+      // TODO
+    });
+
+    // TranscodeHWAccel accel
+    test('to test the property `accel`', () async {
       // TODO
     });
 

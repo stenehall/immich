@@ -1,10 +1,10 @@
-import { CropOptions, IThumbnailRepository, ResizeOptions } from '@app/domain';
+import { CropOptions,IThumbnailRepository,ResizeOptions } from '@app/domain';
 import ffmpeg from 'fluent-ffmpeg';
 import sharp from 'sharp';
 
 export class ThumbnailRepository implements IThumbnailRepository {
   crop(input: string, options: CropOptions): Promise<Buffer> {
-    return sharp(input, { failOnError: false })
+    return sharp(input, { failOnError: true })
       .extract({
         left: options.left,
         top: options.top,
@@ -17,7 +17,7 @@ export class ThumbnailRepository implements IThumbnailRepository {
   async resize(input: string | Buffer, output: string, options: ResizeOptions): Promise<void> {
     switch (options.format) {
       case 'webp':
-        await sharp(input, { failOnError: false })
+        await sharp(input, { failOnError: true })
           .resize(options.size, options.size, { fit: 'outside', withoutEnlargement: true })
           .webp()
           .rotate()
@@ -25,7 +25,7 @@ export class ThumbnailRepository implements IThumbnailRepository {
         return;
 
       case 'jpeg':
-        await sharp(input, { failOnError: false })
+        await sharp(input, { failOnError: true })
           .resize(options.size, options.size, { fit: 'outside', withoutEnlargement: true })
           .jpeg()
           .rotate()

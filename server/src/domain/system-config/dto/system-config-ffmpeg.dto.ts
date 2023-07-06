@@ -1,4 +1,4 @@
-import { TranscodePreset } from '@app/infra/entities';
+import { AudioCodec, TranscodeHWAccel, TranscodePolicy, VideoCodec } from '@app/infra/entities';
 import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import { IsBoolean, IsEnum, IsInt, IsString, Max, Min } from 'class-validator';
@@ -20,11 +20,11 @@ export class SystemConfigFFmpegDto {
   @IsString()
   preset!: string;
 
-  @IsString()
-  targetVideoCodec!: string;
+  @IsEnum(VideoCodec)
+  targetVideoCodec!: VideoCodec;
 
   @IsString()
-  targetAudioCodec!: string;
+  targetAudioCodec!: AudioCodec;
 
   @IsString()
   targetResolution!: string;
@@ -35,6 +35,9 @@ export class SystemConfigFFmpegDto {
   @IsBoolean()
   twoPass!: boolean;
 
-  @IsEnum(TranscodePreset)
-  transcode!: TranscodePreset;
+  @IsEnum(TranscodePolicy)
+  transcode!: TranscodePolicy;
+
+  @IsEnum(TranscodeHWAccel)
+  accel!: TranscodeHWAccel;
 }

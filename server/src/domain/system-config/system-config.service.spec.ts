@@ -1,4 +1,12 @@
-import { SystemConfig, SystemConfigEntity, SystemConfigKey, TranscodePreset } from '@app/infra/entities';
+import {
+  AudioCodec,
+  SystemConfig,
+  SystemConfigEntity,
+  SystemConfigKey,
+  TranscodeHWAccel,
+  TranscodePolicy,
+  VideoCodec,
+} from '@app/infra/entities';
 import { BadRequestException } from '@nestjs/common';
 import { newJobRepositoryMock, newSystemConfigRepositoryMock, systemConfigStub } from '@test';
 import { IJobRepository, JobName, QueueName } from '../job';
@@ -28,12 +36,13 @@ const updatedConfig = Object.freeze<SystemConfig>({
     crf: 30,
     threads: 0,
     preset: 'ultrafast',
-    targetAudioCodec: 'aac',
+    targetAudioCodec: AudioCodec.AAC,
     targetResolution: '720',
-    targetVideoCodec: 'h264',
+    targetVideoCodec: VideoCodec.H264,
     maxBitrate: '0',
     twoPass: false,
-    transcode: TranscodePreset.REQUIRED,
+    transcode: TranscodePolicy.REQUIRED,
+    accel: TranscodeHWAccel.DISABLED,
   },
   oauth: {
     autoLaunch: true,

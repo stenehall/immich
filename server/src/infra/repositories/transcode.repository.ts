@@ -40,7 +40,10 @@ export class TranscodeRepository implements ITranscodeRepository {
         ffmpeg(input, { niceness: 10 })
           .outputOptions(options.outputOptions)
           .output(output)
-          .on('error', reject)
+          .on('error', (err, stdout, stderr) => {
+            console.log(stderr);
+            reject(err);
+          })
           .on('end', resolve)
           .run();
       });
@@ -63,7 +66,10 @@ export class TranscodeRepository implements ITranscodeRepository {
             .addOptions('-pass', '2')
             .addOptions('-passlogfile', output)
             .output(output)
-            .on('error', reject)
+            .on('error', (err, stdout, stderr) => {
+              console.log(stderr);
+              reject(err);
+            })
             .on('end', () => fs.unlink(`${output}-0.log`))
             .on('end', () => fs.rm(`${output}-0.log.mbtree`, { force: true }))
             .on('end', resolve)
