@@ -15,7 +15,10 @@ abstract class BaseHandler {
       outputOptions: this.getBaseOutputOptions(),
       twoPass: eligibleForTwoPass(this.config) && this.config.accel === TranscodeHWAccel.DISABLED,
     } as TranscodeOptions;
-    options.outputOptions.push(...this.getFilterOptions(stream));
+    const filters = this.getFilterOptions(stream);
+    if (filters.length > 0) {
+      options.outputOptions.push(`-vf ${filters.join(',')}`);
+    }
     options.outputOptions.push(...this.getPresetOptions());
     options.outputOptions.push(...this.getThreadOptions());
     options.outputOptions.push(...this.getBitrateOptions());
@@ -39,11 +42,12 @@ abstract class BaseHandler {
   }
 
   getFilterOptions(stream: VideoStreamInfo) {
-    if (!shouldScale(stream, this.config)) {
-      return [];
+    const options = [];
+    if (shouldScale(stream, this.config)) {
+      options.push(`scale=${getScaling(stream, this.config)}`);
     }
 
-    return [`-vf scale=${getScaling(stream, this.config)}`];
+    return options;
   }
 
   getPresetOptions() {
@@ -160,11 +164,12 @@ export class NVENCHandler extends BaseHandler implements VideoCodecHWHandler {
   }
 
   getFilterOptions(stream: VideoStreamInfo) {
-    if (!shouldScale(stream, this.config)) {
-      return ['-vf hwupload'];
+    const options = ['hwupload'];
+    if (shouldScale(stream, this.config)) {
+      options.push(`scale_cuda=${getScaling(stream, this.config)}`);
     }
 
-    return [`-vf hwupload,scale_cuda=${getScaling(stream, this.config)}`];
+    return options;
   }
 
   getPresetOptions() {
@@ -185,8 +190,7 @@ export class NVENCHandler extends BaseHandler implements VideoCodecHWHandler {
         `-bufsize ${bitrates.target}${bitrates.unit}`,
         '-multipass 2',
       ];
-    }
-    if (bitrates.max > 0) {
+    } else if (bitrates.max > 0) {
       return [
         `-cq:v ${this.config.crf}`,
         `-maxrate ${bitrates.max}${bitrates.unit}`,
@@ -208,7 +212,7 @@ export class QSVHandler extends BaseHandler implements VideoCodecHWHandler {
   }
 
   getBaseInputOptions() {
-    return ['-hwaccel qsv', '-hwaccel_output_format qsv'];
+    return ['-hwaccel qsv', '-init_hw_device qsv=accel', '-hwaccel_output_format qsv'];
   }
 
   getBaseOutputOptions() {
@@ -217,15 +221,17 @@ export class QSVHandler extends BaseHandler implements VideoCodecHWHandler {
       `-acodec ${this.config.targetAudioCodec}`,
       '-movflags faststart',
       '-fps_mode passthrough',
+      '-filter_hw_device accel',
     ];
   }
 
   getFilterOptions(stream: VideoStreamInfo) {
-    if (!shouldScale(stream, this.config)) {
-      return [];
+    // no-op if the video can be hardware decoded, else software decode
+    const options = ['format=nv12|qsv', 'hwupload=extra_hw_frames=64'];
+    if (shouldScale(stream, this.config)) {
+      options.push(`scale_qsv=${getScaling(stream, this.config)}`);
     }
-
-    return [`-vf scale_qsv=${getScaling(stream, this.config)}`];
+    return options;
   }
 
   getPresetOptions() {
@@ -233,17 +239,17 @@ export class QSVHandler extends BaseHandler implements VideoCodecHWHandler {
     if (presetIndex < 0) {
       return [];
     }
-    presetIndex = Math.min(6, presetIndex) + 1; // 1 to p7
+    presetIndex = Math.min(6, presetIndex) + 1; // 1 to 7
     return [`-preset ${presetIndex}`];
   }
 
   getBitrateOptions() {
+    const options = [`-global_quality ${this.config.crf}`];
     const bitrates = getBitrateDistribution(this.config);
     if (bitrates.max > 0) {
-      return [`-global_quality ${this.config.crf}`, `-maxrate ${bitrates.max}${bitrates.unit}`];
-    } else {
-      return [`-global_quality ${this.config.crf}`];
+      options.push(`-maxrate ${bitrates.max}${bitrates.unit}`);
     }
+    return options;
   }
 
   getThreadOptions() {
@@ -257,7 +263,12 @@ export class VAAPIHandler extends BaseHandler implements VideoCodecHWHandler {
   }
 
   getBaseInputOptions() {
-    return ['-hwaccel vaapi', '-hwaccel_output_format vaapi'];
+    return [
+      '-init_hw_device vaapi=accel:/dev/dri/renderD128',
+      '-hwaccel vaapi',
+      '-hwaccel_output_format vaapi',
+      '-hwaccel_device accel ',
+    ];
   }
 
   getBaseOutputOptions() {
@@ -266,15 +277,18 @@ export class VAAPIHandler extends BaseHandler implements VideoCodecHWHandler {
       `-acodec ${this.config.targetAudioCodec}`,
       '-movflags faststart',
       '-fps_mode passthrough',
+      '-filter_hw_device accel',
     ];
   }
 
   getFilterOptions(stream: VideoStreamInfo) {
-    if (!shouldScale(stream, this.config)) {
-      return ['-vf hwupload'];
+    // no-op if the video can be hardware decoded, else software decode
+    const options = ['format=nv12|vaapi', 'hwupload'];
+    if (shouldScale(stream, this.config)) {
+      options.push(`scale_vaapi=${getScaling(stream, this.config)}`);
     }
 
-    return [`-vf hwupload,scale_vaapi=${getScaling(stream, this.config)}`];
+    return options;
   }
 
   getPresetOptions() {
@@ -282,25 +296,22 @@ export class VAAPIHandler extends BaseHandler implements VideoCodecHWHandler {
     if (presetIndex < 0) {
       return [];
     }
-    presetIndex = Math.min(6, presetIndex) + 1; // 1 to p7
-    return [`-preset ${presetIndex}`];
+    presetIndex = Math.min(6, presetIndex) + 1; // 1 to 7
+    return [`-compression_level ${presetIndex}`];
   }
 
   getBitrateOptions() {
     const bitrates = getBitrateDistribution(this.config);
+    // VAAPI doesn't allow setting both quality and max bitrate
     if (bitrates.max > 0) {
-      return [
-        `-q ${this.config.crf} -rc_mode icq`,
-        `-global_quality ${this.config.crf}`,
-        `-maxrate ${bitrates.max}${bitrates.unit}`,
-      ];
+      return [`-b:v ${bitrates.target}${bitrates.unit}`, `-maxrate ${bitrates.max}${bitrates.unit}`];
     } else {
-      return [`-q ${this.config.crf} -rc_mode icq`];
+      return [`-qp ${this.config.crf}`, `-global_quality ${this.config.crf}`, '-rc_mode 4']; // intelligent constant-quality
     }
   }
 
   getThreadOptions() {
-    return [];
+    return [`-threads ${this.config.threads}`];
   }
 }
 
