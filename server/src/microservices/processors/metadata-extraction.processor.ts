@@ -15,6 +15,7 @@ import { Inject, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DefaultReadTaskOptions, ExifDateTime, exiftool, ReadTaskOptions, Tags } from 'exiftool-vendored';
+import { firstDateTime } from 'exiftool-vendored/dist/FirstDateTime';
 import * as geotz from 'geo-tz';
 import { Duration } from 'luxon';
 import fs from 'node:fs';
@@ -195,6 +196,8 @@ export class MetadataExtractionProcessor {
 
     const tags = { ...mediaTags, ...sidecarTags };
 
+    this.logger.verbose('Exif Tags', tags);
+
     const exifDate = (dt: ExifDateTime | string | undefined) => (dt instanceof ExifDateTime ? dt?.toDate() : null);
 
     const validate = <T>(value: T): T | null => (typeof value === 'string' ? null : value ?? null);
@@ -203,7 +206,7 @@ export class MetadataExtractionProcessor {
       <ExifEntity>{
         // altitude: tags.GPSAltitude ?? null,
         assetId: asset.id,
-        dateTimeOriginal: exifDate(tags.DateTimeOriginal) ?? asset.fileCreatedAt,
+        dateTimeOriginal: exifDate(firstDateTime(tags)) ?? asset.fileCreatedAt,
         exifImageHeight: validate(tags.ImageHeight),
         exifImageWidth: validate(tags.ImageWidth),
         exposureTime: tags.ExposureTime ?? null,
