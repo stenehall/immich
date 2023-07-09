@@ -1673,7 +1673,13 @@
         "responses": {
           "200": {
             "content": {
-              "application/octet-stream": {
+              "image/jpeg": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              },
+              "image/webp": {
                 "schema": {
                   "type": "string",
                   "format": "binary"
@@ -2704,7 +2710,7 @@
         "responses": {
           "200": {
             "content": {
-              "application/octet-stream": {
+              "image/jpeg": {
                 "schema": {
                   "type": "string",
                   "format": "binary"
@@ -4322,7 +4328,7 @@
   "info": {
     "title": "Immich",
     "description": "Immich API",
-    "version": "1.65.0",
+    "version": "1.66.1",
     "contact": {}
   },
   "tags": [],
@@ -4921,6 +4927,14 @@
           "VIDEO",
           "AUDIO",
           "OTHER"
+        ]
+      },
+      "AudioCodec": {
+        "type": "string",
+        "enum": [
+          "mp3",
+          "aac",
+          "opus"
         ]
       },
       "AuthDeviceResponseDto": {
@@ -6341,13 +6355,16 @@
           "threads": {
             "type": "integer"
           },
-          "preset": {
-            "type": "string"
-          },
           "targetVideoCodec": {
-            "type": "string"
+            "$ref": "#/components/schemas/VideoCodec"
           },
           "targetAudioCodec": {
+            "$ref": "#/components/schemas/AudioCodec"
+          },
+          "transcode": {
+            "$ref": "#/components/schemas/TranscodePolicy"
+          },
+          "preset": {
             "type": "string"
           },
           "targetResolution": {
@@ -6358,27 +6375,18 @@
           },
           "twoPass": {
             "type": "boolean"
-          },
-          "transcode": {
-            "type": "string",
-            "enum": [
-              "all",
-              "optimal",
-              "required",
-              "disabled"
-            ]
           }
         },
         "required": [
           "crf",
           "threads",
-          "preset",
           "targetVideoCodec",
           "targetAudioCodec",
+          "transcode",
+          "preset",
           "targetResolution",
           "maxBitrate",
-          "twoPass",
-          "transcode"
+          "twoPass"
         ]
       },
       "SystemConfigJobDto": {
@@ -6598,6 +6606,15 @@
           "month"
         ]
       },
+      "TranscodePolicy": {
+        "type": "string",
+        "enum": [
+          "all",
+          "optimal",
+          "required",
+          "disabled"
+        ]
+      },
       "UpdateAlbumDto": {
         "type": "object",
         "properties": {
@@ -6797,6 +6814,14 @@
         },
         "required": [
           "authStatus"
+        ]
+      },
+      "VideoCodec": {
+        "type": "string",
+        "enum": [
+          "h264",
+          "hevc",
+          "vp9"
         ]
       }
     }
