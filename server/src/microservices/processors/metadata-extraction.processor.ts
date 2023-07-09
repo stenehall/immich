@@ -14,7 +14,7 @@ import { AssetEntity, AssetType, ExifEntity } from '@app/infra/entities';
 import { Inject, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
-import { ExifDateTime, exiftool, Tags } from 'exiftool-vendored';
+import { DefaultReadTaskOptions, ExifDateTime, exiftool, ReadTaskOptions, Tags } from 'exiftool-vendored';
 import * as geotz from 'geo-tz';
 import { Duration } from 'luxon';
 import fs from 'node:fs';
@@ -168,13 +168,13 @@ export class MetadataExtractionProcessor {
   }
 
   private async exifData(asset: AssetEntity): Promise<[ExifEntity, ImmichTags]> {
-    const readTaskOptions = {
+    const readTaskOptions: ReadTaskOptions = {
+      ...DefaultReadTaskOptions,
+
       defaultVideosToUTC: false,
       useMWG: true,
-      numericTags: ['Duration', 'FocalLength'],
-      includeImageDataMD5: false,
+      numericTags: DefaultReadTaskOptions.numericTags.concat(['FocalLength']),
       geoTz: (lat: number, lon: number): string => geotz.find(lat, lon)[0],
-      optionalArgs: [],
     };
 
     const mediaTags = await exiftool
