@@ -13,6 +13,7 @@ Name | Type | Description | Notes
 **targetVideoCodec** | [**VideoCodec**](VideoCodec.md) |  | 
 **targetAudioCodec** | [**AudioCodec**](AudioCodec.md) |  | 
 **transcode** | [**TranscodePolicy**](TranscodePolicy.md) |  | 
+**accel** | [**TranscodeHWAccel**](TranscodeHWAccel.md) |  | 
 **preset** | **String** |  | 
 **targetResolution** | **String** |  | 
 **maxBitrate** | **String** |  | 

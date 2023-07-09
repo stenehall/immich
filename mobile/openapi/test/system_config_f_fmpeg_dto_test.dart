@@ -41,6 +41,11 @@ void main() {
       // TODO
     });
 
+    // TranscodeHWAccel accel
+    test('to test the property `accel`', () async {
+      // TODO
+    });
+
     // String preset
     test('to test the property `preset`', () async {
       // TODO

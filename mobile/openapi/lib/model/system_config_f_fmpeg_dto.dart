@@ -18,6 +18,7 @@ class SystemConfigFFmpegDto {
     required this.targetVideoCodec,
     required this.targetAudioCodec,
     required this.transcode,
+    required this.accel,
     required this.preset,
     required this.targetResolution,
     required this.maxBitrate,
@@ -34,6 +35,8 @@ class SystemConfigFFmpegDto {
 
   TranscodePolicy transcode;
 
+  TranscodeHWAccel accel;
+
   String preset;
 
   String targetResolution;
@@ -49,6 +52,7 @@ class SystemConfigFFmpegDto {
      other.targetVideoCodec == targetVideoCodec &&
      other.targetAudioCodec == targetAudioCodec &&
      other.transcode == transcode &&
+     other.accel == accel &&
      other.preset == preset &&
      other.targetResolution == targetResolution &&
      other.maxBitrate == maxBitrate &&
@@ -62,13 +66,14 @@ class SystemConfigFFmpegDto {
     (targetVideoCodec.hashCode) +
     (targetAudioCodec.hashCode) +
     (transcode.hashCode) +
+    (accel.hashCode) +
     (preset.hashCode) +
     (targetResolution.hashCode) +
     (maxBitrate.hashCode) +
     (twoPass.hashCode);
 
   @override
-  String toString() => 'SystemConfigFFmpegDto[crf=$crf, threads=$threads, targetVideoCodec=$targetVideoCodec, targetAudioCodec=$targetAudioCodec, transcode=$transcode, preset=$preset, targetResolution=$targetResolution, maxBitrate=$maxBitrate, twoPass=$twoPass]';
+  String toString() => 'SystemConfigFFmpegDto[crf=$crf, threads=$threads, targetVideoCodec=$targetVideoCodec, targetAudioCodec=$targetAudioCodec, transcode=$transcode, accel=$accel, preset=$preset, targetResolution=$targetResolution, maxBitrate=$maxBitrate, twoPass=$twoPass]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
@@ -77,6 +82,7 @@ class SystemConfigFFmpegDto {
       json[r'targetVideoCodec'] = this.targetVideoCodec;
       json[r'targetAudioCodec'] = this.targetAudioCodec;
       json[r'transcode'] = this.transcode;
+      json[r'accel'] = this.accel;
       json[r'preset'] = this.preset;
       json[r'targetResolution'] = this.targetResolution;
       json[r'maxBitrate'] = this.maxBitrate;
@@ -97,6 +103,7 @@ class SystemConfigFFmpegDto {
         targetVideoCodec: VideoCodec.fromJson(json[r'targetVideoCodec'])!,
         targetAudioCodec: AudioCodec.fromJson(json[r'targetAudioCodec'])!,
         transcode: TranscodePolicy.fromJson(json[r'transcode'])!,
+        accel: TranscodeHWAccel.fromJson(json[r'accel'])!,
         preset: mapValueOfType<String>(json, r'preset')!,
         targetResolution: mapValueOfType<String>(json, r'targetResolution')!,
         maxBitrate: mapValueOfType<String>(json, r'maxBitrate')!,
@@ -153,6 +160,7 @@ class SystemConfigFFmpegDto {
     'targetVideoCodec',
     'targetAudioCodec',
     'transcode',
+    'accel',
     'preset',
     'targetResolution',
     'maxBitrate',

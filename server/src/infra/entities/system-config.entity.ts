@@ -23,6 +23,7 @@ export enum SystemConfigKey {
   FFMPEG_MAX_BITRATE = 'ffmpeg.maxBitrate',
   FFMPEG_TWO_PASS = 'ffmpeg.twoPass',
   FFMPEG_TRANSCODE = 'ffmpeg.transcode',
+  FFMPEG_ACCEL = 'ffmpeg.accel',
 
   JOB_THUMBNAIL_GENERATION_CONCURRENCY = 'job.thumbnailGeneration.concurrency',
   JOB_METADATA_EXTRACTION_CONCURRENCY = 'job.metadataExtraction.concurrency',
@@ -70,6 +71,13 @@ export enum AudioCodec {
   OPUS = 'opus',
 }
 
+export enum TranscodeHWAccel {
+  NVENC = 'nvenc',
+  QSV = 'qsv',
+  VAAPI = 'vaapi',
+  DISABLED = 'disabled',
+}
+
 export interface SystemConfig {
   ffmpeg: {
     crf: number;
@@ -81,6 +89,7 @@ export interface SystemConfig {
     maxBitrate: string;
     twoPass: boolean;
     transcode: TranscodePolicy;
+    accel: TranscodeHWAccel;
   };
   job: Record<QueueName, { concurrency: number }>;
   oauth: {

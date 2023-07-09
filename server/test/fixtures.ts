@@ -28,6 +28,7 @@ import {
   SystemConfig,
   TagEntity,
   TagType,
+  TranscodeHWAccel,
   TranscodePolicy,
   UserEntity,
   UserTokenEntity,
@@ -693,6 +694,7 @@ export const systemConfigStub = {
       maxBitrate: '0',
       twoPass: false,
       transcode: TranscodePolicy.REQUIRED,
+      accel: TranscodeHWAccel.DISABLED,
     },
     job: {
       [QueueName.BACKGROUND_TASK]: { concurrency: 5 },
