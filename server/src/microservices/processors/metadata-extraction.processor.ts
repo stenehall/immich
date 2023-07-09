@@ -186,9 +186,9 @@ export class MetadataExtractionProcessor {
 
     const sidecarTags = asset.sidecarPath
       ? await exiftool.read<ImmichTags>(asset.sidecarPath, undefined, readTaskOptions).catch((error: any) => {
-        this.logger.warn(`error reading exif data (${asset.id} at ${asset.sidecarPath}): ${error}`, error?.stack);
-        return null;
-      })
+          this.logger.warn(`error reading exif data (${asset.id} at ${asset.sidecarPath}): ${error}`, error?.stack);
+          return null;
+        })
       : null;
 
     const stats = fs.statSync(asset.originalPath);
